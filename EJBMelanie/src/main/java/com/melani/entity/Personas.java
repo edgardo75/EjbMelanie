@@ -46,7 +46,7 @@ public class Personas implements Serializable {
     @Id
     @GeneratedValue(generator="PersonaIdGen",strategy=GenerationType.TABLE)
     @Column(name = "ID_PERSONA")
-    private Long idPersona;
+    private long idPersona;
     @Column(name = "NOMBRE",length=30)
     private String nombre;
     @Column(name = "APELLIDO",length=30)
@@ -74,7 +74,7 @@ public class Personas implements Serializable {
     public Personas(){
     }
 
-    public Long getIdPersona() {
+    public long getIdPersona() {
         return idPersona;
     }
 
@@ -161,20 +161,30 @@ public class Personas implements Serializable {
     public void setGeneros(Generos generos) {
         this.generos = generos;
     }
-     @Override
+
+    @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (idPersona != null ? idPersona.hashCode() : 0);
+        int hash = 5;
+        hash = 97 * hash + (int) (this.idPersona ^ (this.idPersona >>> 32));
         return hash;
     }
+
     @Override
-    public boolean equals(Object object) {       
-        if (!(object instanceof Personas)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        Personas other = (Personas) object;
-        return (this.idPersona != null || other.idPersona == null) && (this.idPersona == null || this.idPersona.equals(other.idPersona));
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Personas other = (Personas) obj;
+        return this.idPersona == other.idPersona;
     }
+    
+    
     @Override
     public String toString() {
         return "entity.Personas[idPersona=" + idPersona + "]";

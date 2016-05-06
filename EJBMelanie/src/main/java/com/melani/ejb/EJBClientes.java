@@ -254,7 +254,7 @@ private long actualizarDatos(ClienteDomicilioTelefono todosDatos,
     }
 
 private long guardarDomicilioyTelefonoCliente(String xmlClienteDomicilioTelefono,Clientes cliente, ClienteDomicilioTelefono todosDatos) {
-        long retorno=0;
+        long retorno;
         long idDomicilio;       
            if(xmlClienteDomicilioTelefono.contains("<Domicilio>")){
                         idDomicilio = ejbdomici.addDomicilios(todosDatos.getDomicilio());                 

@@ -21,12 +21,12 @@ public class EJBDomicilios implements EJBDomiciliosRemote {
     private EntityManager em; 
     private long idDomicilio=0; 
     @Override
- public long addDomicilios(DatosDomicilios datosDomici) {
+ public long addDomicilios(DatosDomicilios datosDomicilio) {
         long retorno;        
-            idDomicilio= existe(datosDomici);
-            switch((int)idDomicilio){
+            idDomicilio= existe(datosDomicilio);
+               switch((int)idDomicilio){
                     case 0:{                    
-                            retorno = procesarAddDomicilio(datosDomici);                            
+                            retorno = procesarAddDomicilio(datosDomicilio);                            
                         break;
                     }                   
                     case -1:{
@@ -34,7 +34,7 @@ public class EJBDomicilios implements EJBDomiciliosRemote {
                     break;
                     }
                 default:{                   
-                        retorno = actualizarDomicilio(datosDomici,idDomicilio);  
+                        retorno = actualizarDomicilio(datosDomicilio,idDomicilio);  
                     break;
                 }
             }       

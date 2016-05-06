@@ -1,6 +1,8 @@
 package com.melani.utils;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,35 +20,32 @@ public class ProjectHelpers {
     public static class ClaveSeguridad{
         public static String encriptar(String frase){
                             String encryptedRet="No Encrypted";
-                            try {            
+                          try {            
                                 Cipher cipher = Cipher.getInstance("Blowfish");                                            
                                 cipher.init(Cipher.ENCRYPT_MODE, KEY);            
-                                byte[]encrypted=cipher.doFinal(frase.getBytes());            
+                                byte[]encrypted=cipher.doFinal(frase.getBytes("ISO8859-1"));            
                                 encryptedRet=new String(encrypted);                          
                             } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
                                 Logger.getLogger(e.getMessage());
-                            }
-                               return encryptedRet;                                
-                }
+                            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(ProjectHelpers.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return encryptedRet;                                
+      }
         public static String decriptar(String fraseEncriptada){
                 String decriptedRet="No decrypted";
-                decriptedRet = decriptWord(fraseEncriptada,decriptedRet);
-                    return decriptedRet;                                
-        }
-        private static String decriptWord(String fraseEncriptada,String decriptedRet) {
-            String afterEncryption=null;
-            try {
+               try {
                 Cipher cipher = Cipher.getInstance("Blowfish");
                 cipher.init(Cipher.DECRYPT_MODE, KEY);
-                byte[] encryptedData=fraseEncriptada.getBytes();
+                byte[] encryptedData=fraseEncriptada.getBytes("ISO8859-1");
                 byte[] decrypted = cipher.doFinal(encryptedData);
-                 afterEncryption = new String(decrypted);
-            } catch (NoSuchAlgorithmException | NoSuchPaddingException |InvalidKeyException | IllegalBlockSizeException |BadPaddingException ex) {
+                 decriptedRet = new String(decrypted);
+            } catch (UnsupportedEncodingException|NoSuchAlgorithmException | NoSuchPaddingException |InvalidKeyException | IllegalBlockSizeException |BadPaddingException ex) {
                 Logger.getLogger(ex.getMessage());
-            }
-            decriptedRet = afterEncryption;
-            return decriptedRet;                  
+            }             
+          return decriptedRet;                                
         }
+        
     }
     public static class NombreUsuarioValidator{
         private static final String NAMEUSER_PATTERN="(?=^.{1,20}$)^([\\w\\.^\\-.][\\s]?)([\\w\\-\\s]*)([\\w]+$?)+$";            

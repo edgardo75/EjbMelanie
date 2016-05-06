@@ -9,32 +9,32 @@ import javax.persistence.Embeddable;
 public class PersonasdomiciliosPK implements Serializable {
     @Basic(optional = false)
     @Column(name = "IDDOMICILIO", nullable = false)
-    private Long iddomicilio;
+    private long iddomicilio;
 
     @Basic(optional = false)
     @Column(name = "ID_PERSONA",precision = 16)
-    protected Long idPersona;
+    protected long idPersona;
 
     public PersonasdomiciliosPK(){}
 
-    public PersonasdomiciliosPK(Long idDomicilio,Long idPersona){
+    public PersonasdomiciliosPK(long idDomicilio,long idPersona){
         this.iddomicilio=idDomicilio;
         this.idPersona = idPersona;
     }
 
-    public Long getId() {
+    public long getId() {
         return iddomicilio;
     }
 
-    public void setId(Long idDomicilio) {
+    public void setId(long idDomicilio) {
         this.iddomicilio = idDomicilio;
     }
 
-    public Long getIdPersona() {
+    public long getIdPersona() {
         return idPersona;
     }
 
-    public void setIdPersona(Long idPersona) {
+    public void setIdPersona(long idPersona) {
         this.idPersona = idPersona;
     }
     @Override

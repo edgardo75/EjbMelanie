@@ -43,8 +43,8 @@ public class PersonasDomicilios implements Serializable {
         this.personasdomiciliosPK = personasdomiciliosPK;
     }
 
-    public PersonasDomicilios(Long id,Long idPersona){
-        this.personasdomiciliosPK = new PersonasdomiciliosPK(id,idPersona);
+    public PersonasDomicilios(long idDomicilio,long idPersona){
+        this.personasdomiciliosPK = new PersonasdomiciliosPK(idDomicilio,idPersona);
     }
 
     public Domicilios getDomicilioss() {

@@ -19,6 +19,7 @@ import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import org.apache.commons.lang3.StringEscapeUtils;
 @Stateless(name="ejb/EJBEmpleados")
 @WebService(serviceName="ServicesEmpleados",name="EmpleadosWs")
 public class EJBEmpleados implements EJBEmpleadosRemote {     
@@ -64,10 +65,11 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                         .append("<genero>").append(empleados.getGeneros().getIdGenero()).append("</genero>\n")
                         .append("<tipodocu>").append(empleados.getTipodocumento().getId()).append("</tipodocu>\n")
                         .append("<documento>").append(empleados.getNrodocumento()).append("</documento>\n")
-                        .append("<observaciones>").append(empleados.getObservaciones())                                
-                        .append("</observaciones>\n")
+                        .append("<emptype>").append(empleados.getEmptype()).append("</emptype>\n")                              
+                        .append("<observaciones>").append(empleados.getObservaciones()).append("</observaciones>\n")
                         .append("<email>").append(empleados.getEmail()).append("</email>\n")
-                        .append("<clave>").append(ProjectHelpers.ClaveSeguridad.decriptar(empleados.getPassword())).append("</clave>")
+                        .append("<nameuser>").append(empleados.getNameuser()).append("</nameuser>\n")                              
+                        .append("<clave>").append(StringEscapeUtils.escapeXml11(ProjectHelpers.ClaveSeguridad.decriptar(empleados.getPassword()))).append("</clave>")
                         .append(obtenerEmpleado(empleados))
                         .append("</item>\n");
                 }                   
@@ -75,10 +77,8 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
             }else {
                 xml+="<result>Lista Vacia</result>\n";
             }        
-            xml+="</Lista>\n";
-            
-            return xml;
-        
+            xml+="</Lista>\n";            
+            return xml;        
     }
     protected String obtenerEmpleado(Empleados emp){
         String xml=null;
@@ -155,8 +155,8 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
     public long actualizarEmpleado(String xmlEmpleado){   
         long retorno;         
             DatosEmpleado empleado = datosEmpleadosObject(xmlEmpleado);//convierto a objeto           
-           retorno=validateData(empleado);//retorno el resultado de validar datos nombre y apellido, password           
-           if(retorno==0){           
+          retorno=validateData(empleado);//retorno el resultado de validar datos nombre y apellido, password           
+           if(retorno==0){      
                         retorno = valorRetornadoAlBuscarEmailyNombreUsuario(retorno, empleado.getNumeroDocumento(),
                                 empleado.getEmail(),empleado.getNombreUsuario());                        
                             if(retorno>0){   
@@ -165,7 +165,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
            }
            return retorno;      
     }
-    private void actualizarReferenciasConNotasdePedido(long nuevoEmployee, int idEmpleado) {       
+    private void actualizarReferenciasConNotasdePedido(long nuevoEmployee, long idEmpleado) {       
             Query sql = em.createNamedQuery("Notadepedido.findAll", Notadepedido.class);
             List<Notadepedido>lista = sql.getResultList();
             for(Notadepedido n:lista){
@@ -261,37 +261,30 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
     }     
     private long validateData(DatosEmpleado empleado) {
         long retorno=0;                  
-            String numeroDocumento = String.valueOf(empleado.getNumeroDocumento());            
+         String numeroDocumento = String.valueOf(empleado.getNumeroDocumento());            
             if(!ProjectHelpers.NumeroDocumentoValidator.validate(numeroDocumento)){
                 retorno =-16;
             }else {            
                 if(!empleado.getNombre().isEmpty()&&ProjectHelpers.NombreyApellidoValidator.validate(empleado.getNombre())){
                     if(!empleado.getApellido().isEmpty()&&ProjectHelpers.NombreyApellidoValidator.validate(empleado.getApellido())){
                         if(empleado.getPassword().equals(empleado.getPasswordre())){
-                            
-                            
                             if(!ProjectHelpers.NombreUsuarioValidator.validate(empleado.getNombreUsuario())) {
                                 retorno=-12;
                             }
                             
                             if(!ProjectHelpers.PasswordValidator.validate(empleado.getPassword()) && (empleado.getPassword().equals(empleado.getPasswordre()))) {
                                 retorno=-11;
+                            
                             }else{
-                                
-                                String encriptedText = ProjectHelpers.ClaveSeguridad.encriptar(empleado.getPassword());
-                                
+                               String encriptedText = ProjectHelpers.ClaveSeguridad.encriptar(empleado.getPassword());
                                 String decriptedText = ProjectHelpers.ClaveSeguridad.decriptar(encriptedText);
-                                
                                 if(!ProjectHelpers.PasswordValidator.validate(decriptedText)){
                                     retorno = -17;
                                 }
-                            }
-                            
+                            }                           
                         }else{
                             retorno =-13;
                         }
-                        
-                        
                     }else {
                         retorno =-15;
                     }
@@ -347,7 +340,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
         int retEmployee;
         long retorno = 0;
         //selecciono la persona con el tipo de empleado a buscar
-                                               Query sqlEmpleadoEmptype =em.createQuery("Select e From Empleados e "
+                                      Query sqlEmpleadoEmptype =em.createQuery("Select e From Empleados e "
                                                        + "Where e.idPersona = :idpersona and e.emptype like :emptype");
                                                    sqlEmpleadoEmptype.setParameter("idpersona",(long) empleado.getId());
                                                    sqlEmpleadoEmptype.setParameter("emptype", empleado.getTipoEmpleado());
@@ -366,6 +359,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
 
 
                      if(retEmployee==1){
+                         
                                           Query sqlemail = em.createQuery("SELECT p FROM Personas p WHERE p.email = :email");
                                                  sqlemail.setParameter("email", empleado.getEmail());
                                                     Query sqlusername=em.createQuery("SELECT e FROM Empleados e WHERE e.nameuser = :nameuser");
@@ -387,8 +381,8 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                                                                        actualizarReferenciasConNotasdePedido(nuevoEmployee,empleado.getId());
                                                                        retorno=nuevoEmployee;
                                                                }else{
-                                                                   if(empleado.getTipoEmpleado().equals("PARTTIME")&&retEmpleadoEmptype==0){             
-                                                                               Query deletePartTimeEmployee=em.createNamedQuery("EmpleadoParttime.deleteById");
+                                                                   if(empleado.getTipoEmpleado().equals("PARTTIME")&&retEmpleadoEmptype==0){   
+                                                                       Query deletePartTimeEmployee=em.createNamedQuery("EmpleadoParttime.deleteById");
                                                                                deletePartTimeEmployee.setParameter("idPersona", (long)empleado.getId());
                                                                                deletePartTimeEmployee.executeUpdate();
                                                                                Query deleteEntityEmployee=em.createNamedQuery("Empleados.deleteById");
@@ -403,7 +397,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                                                                        retorno = nuevoEmployee;
                                                                    }else{  
                                                                            if(empleado.getTipoEmpleado().equals("FULLTIME")){
-                                                                                   FullTimeEmpleado fulltimeEmploy=em.find(FullTimeEmpleado.class,(long) empleado.getId());
+                                                                                       FullTimeEmpleado fulltimeEmploy=em.find(FullTimeEmpleado.class,empleado.getId());
                                                                                                        fulltimeEmploy.setApellido(empleado.getApellido());
                                                                                                        if(sqlemail.getResultList().isEmpty()&&empleado.getEmail().contains("@")) {
                                                                                                            fulltimeEmploy.setEmail(empleado.getEmail());          
@@ -420,9 +414,8 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                                                                                                        em.persist(fulltimeEmploy);                                                                                                     
                                                                                                        retorno = fulltimeEmploy.getIdPersona();
                                                                            }else{
-                                                                                 EmpleadoParttime empleadoPartime = null;                                                                                 
-                                                                                        empleadoPartime=em.find(EmpleadoParttime.class,(long) empleado.getId());
-                                                                                                       empleadoPartime.setApellido(empleado.getApellido());                                                                                       
+                                                                               EmpleadoParttime  empleadoPartime=em.find(EmpleadoParttime.class, empleado.getId());
+                                                                                               empleadoPartime.setApellido(empleado.getApellido());                                                                                       
                                                                                                        if(sqlemail.getResultList().isEmpty()&&empleado.getEmail().contains("@")) {
                                                                                                            empleadoPartime.setEmail(empleado.getEmail());
                                                                                                        }
@@ -442,6 +435,8 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                                                                }
                                                        em.flush();
                                                 }  //end if
-         return retorno;                                               
-    }
+                     
+                        return retorno;                                               
+        }
+        
 }

@@ -20,7 +20,7 @@ public class DatosEmpleado {
         return passwordre;
     }
 
-    public Integer getId() {
+    public long getId() {
         return id;
     }
 
