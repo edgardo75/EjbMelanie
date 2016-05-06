@@ -319,7 +319,7 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
             if(resultProcFechas.equals("TODO OK")){    
             try {          
                 Query jpasql = em.createQuery("SELECT n FROM Notadepedido n Where cast(n.fechadecompra as DATE) BETWEEN ?1 AND ?2 AND  n.entregado = ?3 AND n.pendiente =?4 ORDER BY n.fechaentrega,n.id,n.horacompra DESC");
-                jpasql.setParameter("1",DateFormat.getDateInstance().parse(desde),TemporalType.TIMESTAMP);
+                    jpasql.setParameter("1",DateFormat.getDateInstance().parse(desde),TemporalType.TIMESTAMP);
                 jpasql.setParameter("2", DateFormat.getDateInstance().parse(hasta),TemporalType.TIMESTAMP);
                 jpasql.setParameter("3", '0');
                 jpasql.setParameter("4", '1');

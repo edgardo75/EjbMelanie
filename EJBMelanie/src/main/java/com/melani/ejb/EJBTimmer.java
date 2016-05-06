@@ -1,9 +1,8 @@
 package com.melani.ejb;
-import com.melani.utils.ProjectHelpers;
 import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
+import java.util.Calendar;
 import java.util.Properties;
-import java.util.TimeZone;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Schedule;
@@ -28,67 +27,51 @@ import javax.persistence.Query;
 public class EJBTimmer {
     @PersistenceContext(unitName = "EJBMelaniPU2")
     EntityManager em;    
-    @Schedule(persistent = false,timezone = "America/Argentina/San_Juan",second = "50",hour = "11",minute = "16")
+    @Schedule(persistent = false,timezone = "America/Argentina/San_Juan",second = "30",hour = "21",minute = "00")
     private void ventasDiarias(){ 
-        final String miCorreo = "micorreo@gmail.com"; 
-        final String miContrasena = "*****";
-        //final String servidorSMTP = "smtp.gmail.com";
-        final String servidorSMTP = "smtp.live.com";        
-        //final String puertoEnvio = "465";
-        final String puertoEnvio = "587";
-        String mailReceptor = null;
-        String asunto = null;
-        String cuerpo = null;
-        int ventasDia = 0;
+        final String servidorSMTP = ResourceBundle.getBundle("email").getString("mail.smtp.host");                
+        final String puertoEnvio = ResourceBundle.getBundle("email").getString("mail.smtp.port");
                     Properties props = new Properties();
-                    //props.put("mail.smtp.user", miCorreo);
                     props.put("mail.smtp.host", servidorSMTP);
                     props.put("mail.smtp.port", puertoEnvio);
                     props.put("mail.smtp.starttls.enable", "true");
                     props.put("mail.transport.protocol","smtp");
                     props.put("mail.smtp.auth", "true");                  
                     try {
-                        GregorianCalendar gc = new GregorianCalendar(TimeZone.getDefault()); 
+                        
                         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                        Query consulta = em.createQuery("SELECT SUM(n.montototalapagar) FROM Notadepedido n WHERE n.fechadecompra = CURRENT_DATE");
+                        Query consulta = em.createQuery("SELECT SUM(n.montototalapagar) FROM Notadepedido n WHERE cast(n.fechadecompra as DATE) = CURRENT_DATE");
                    Session session = Session.getInstance(props, new Authenticator() {
                         @Override
                         protected PasswordAuthentication getPasswordAuthentication(){
-                         return new PasswordAuthentication("edgardoalvarez@outlook.com", ProjectHelpers.ClaveSeguridad.decriptar("ÅMK˜RÉ 3€\"ÌçD‰"));
+                         return new PasswordAuthentication("fernan2bal@hotmail.com", "30emma30");                                 
                         }
                     });
-                    final MimeMessage message = new MimeMessage(session);
-//                    String result = null;
-//                    if( consulta.getResultList().toString() == null){
-//                        result+="No se registraron ventas!!!";
-//                    }else{
-//                        result+=consulta.getResultList().toString().replace("[", "").replace("]", "");                    }                          
-                    message.setFrom(new InternetAddress("edgardoalvarez@outlook.com"));
-                    message.addRecipient(Message.RecipientType.TO,new InternetAddress("edgardoalvarez@outlook.com"));                    
+                    final MimeMessage message = new MimeMessage(session);//                                      }                          
+                    message.setFrom(new InternetAddress("fernan2bal@hotmail.com"));
+                    message.addRecipient(Message.RecipientType.TO,new InternetAddress("fernan2bal@hotmail.com"));                    
                     Multipart multipart = new MimeMultipart("alternative");
                         MimeBodyPart textPart = new MimeBodyPart();
                         String textContext ;
                         String resultParser = consulta.getResultList().toString().replace("[", "").replace("]","");
                         if(resultParser.equals("null")){
-                             textContext="Ventas del Día "+sdf.format(gc.getTime())+" $ 0";
+                             textContext="Ventas del Día "+sdf.format(Calendar.getInstance().getTime())+" $ 0";
                         }else
-                            textContext="Ventas del Día "+sdf.format(gc.getTime())+" $ "+resultParser;                        
+                            textContext="Ventas del Día "+sdf.format(Calendar.getInstance().getTime())+" $ "+resultParser;                        
                         message.setSubject(textContext);                        
                         textPart.setText(textContext);
                         MimeBodyPart htmlPart = new MimeBodyPart();
-                        String htmlContext = "<html>"+"<h1>Hi</h1>"+
-                                "<p>Hola viejo te envio este email de notificacion de testeo para saber ventas diarias esto "
-                                + "es por email tambien puede ser via movil decime si no está <strong>cool</strong>!!!, "
-                                + "saludos</p>"+"<p>"+textContext+"</p>"+"</html>";
+                        String htmlContext = "<html>"+"<h1>Hola</h1>"+
+                                "<p>"+textContext+"</p>"+"</html>";
                         htmlPart.setContent(htmlContext, "text/html");
                         multipart.addBodyPart(textPart);
                         multipart.addBodyPart(htmlPart);
-                        message.setContent(multipart);
+                        message.setContent(multipart);                        
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 try {                                                                        
-                                    Transport.send(message);                                    
+                                    Transport.send(message);                                                                     
                                 } catch (MessagingException ex) {
                                     java.util.logging.Logger.getLogger(EJBTimmer.class.getName()).log(Level.SEVERE, null, ex);
                                 }
