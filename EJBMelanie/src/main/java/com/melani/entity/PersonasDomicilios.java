@@ -4,7 +4,6 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -30,10 +29,10 @@ public class PersonasDomicilios implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaingresovivienda;
     @JoinColumn(name="ID_PERSONA",referencedColumnName="ID_PERSONA",insertable=false,updatable=false)
-    @ManyToOne(optional = false,fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     private Personas personas;
     @JoinColumn(name = "IDDOMICILIO", referencedColumnName = "ID_DOMICILIO",insertable = false, updatable = false)
-    @ManyToOne(optional=false,fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     private Domicilios domicilioss;
 
     public PersonasDomicilios() {

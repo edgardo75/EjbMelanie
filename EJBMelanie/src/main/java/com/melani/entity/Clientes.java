@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 
@@ -20,7 +21,7 @@ public class Clientes extends Personas implements Serializable {
     private int totalEnPuntos;
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date fechaCarga;
-    @OneToMany(mappedBy = "fkIdcliente",orphanRemoval = true)
+    @OneToMany(mappedBy = "fkIdcliente",orphanRemoval = true,fetch = FetchType.LAZY)
     private List<Notadepedido> notadepedidoList;
 
     public Clientes(){}

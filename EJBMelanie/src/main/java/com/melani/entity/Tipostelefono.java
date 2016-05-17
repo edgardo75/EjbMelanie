@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -24,7 +25,7 @@ public class Tipostelefono implements Serializable {
     private Short idTipotel;    
     @Column(name = "DESCRIPCION")
     private String descripcion;
-    @OneToMany(mappedBy = "idTipotelefono")
+    @OneToMany(mappedBy = "idTipotelefono",fetch = FetchType.LAZY)
     private List<Telefonos> telefonosList;
 
     public Tipostelefono() {

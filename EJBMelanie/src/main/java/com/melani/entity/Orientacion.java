@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -18,7 +19,7 @@ public class Orientacion implements Serializable {
     private Long id;
     @Column(length=10,name="DESCRIPCION",nullable=false)
     private String descripcion;
-    @OneToMany(mappedBy = "idorientacion")
+    @OneToMany(mappedBy = "idorientacion",fetch = FetchType.LAZY)
     private List<Domicilios> domicilioss;
 
     public Orientacion(){}

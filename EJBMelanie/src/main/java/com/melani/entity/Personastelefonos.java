@@ -32,12 +32,12 @@ public class Personastelefonos implements Serializable {
     @Column(name = "DETALLES", length = 60)
     private String detalles;
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "ID_PERSONA", nullable = false, insertable = false, updatable = false)
-    @ManyToOne(optional = false,fetch=FetchType.LAZY)
+    @ManyToOne(optional = false)
     private Personas idPersona;
     @JoinColumns({
         @JoinColumn(name = "NUMEROTEL", referencedColumnName = "NUMERO", nullable = false, insertable = false, updatable = false),
         @JoinColumn(name = "PREFIJO", referencedColumnName = "ID_PREFIJO", nullable = false, insertable = false, updatable = false)})
-    @ManyToOne(optional = false,fetch=FetchType.LAZY)
+    @ManyToOne(optional = false)
     private Telefonos telefonos;
 
     public Personastelefonos() {

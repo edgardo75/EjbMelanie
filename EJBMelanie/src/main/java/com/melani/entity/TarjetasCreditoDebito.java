@@ -23,15 +23,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class TarjetasCreditoDebito implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(fetch = FetchType.LAZY)
     @Column(name="IDTARJETA")
     private Integer idtarjeta;
     @Column(name="DESCRIPCION",length=30)
     private String descripcion;
-    @OneToMany(mappedBy = "idTarjetaFk")
+    @OneToMany(mappedBy = "idTarjetaFk",fetch = FetchType.LAZY)
     private List<Notadepedido> notadepedidoList;
-    @OneToMany(orphanRemoval = true,mappedBy="idTarjetaCreditoDebitoFk")
+    @OneToMany(mappedBy="idTarjetaFk",fetch = FetchType.LAZY)
     private List<EntradasySalidasCaja>entradasysalidascajaList;
 
     public TarjetasCreditoDebito() {

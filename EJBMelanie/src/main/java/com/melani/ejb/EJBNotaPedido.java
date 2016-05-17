@@ -42,10 +42,11 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
     @EJB
     EJBPresupuestosRemote ejbpresupuesto;  
     @EJB
-    EJBEntradasSalidaDiariasRemote ejbentradasSalidas;        
+    EJBEntradasSalidaDiariasRemote ejbEntradasSalidas;        
     DatosNotaPedido notadepedido;    
     volatile double totalCompras;    
     private DatosNotaPedido xstreamNotaPedido(String xmlNotapedido){
+            ProjectHelpers xmlParser = new ProjectHelpers();
             XStream xestream = new XStream(new StaxDriver());
                 xestream.alias("notapedido", DatosNotaPedido.class);
                 xestream.alias("personas", DatosNotaPedido.Personas.class);
@@ -54,7 +55,7 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
                 xestream.alias("itemdetallesnota", Itemdetallesnota.class);
                 xestream.alias("detallesnotapedido", DetallesNotaPedido.class);
                 xestream.addImplicitCollection(DetallesNotaPedido.class, "list");
-            return notadepedido = (DatosNotaPedido) xestream.fromXML(ProjectHelpers.parsearCaracteresEspecialesXML(xmlNotapedido));
+            return notadepedido = (DatosNotaPedido) xestream.fromXML(xmlParser.parsearCaracteresEspecialesXML(xmlNotapedido));
     }    
     @Override
     public long agregarNotaPedido(String xmlNotaPedido) {
@@ -141,35 +142,35 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
                     retorno = notape.getId();        
             return retorno;        
     }
-    private void almacenarHistorico(DatosNotaPedido notadepedido,Notadepedido notape){
+    private void almacenarHistorico(DatosNotaPedido datosNotaPedido,Notadepedido notape){
         
                     GregorianCalendar gc = new GregorianCalendar(Locale.getDefault());                    
                                     Historiconotapedido historico = new Historiconotapedido();                                    
-                                    historico.setAnticipo(notadepedido.getAnticipo());
-                                    historico.setEntregado(notadepedido.getEntregado());
+                                    historico.setAnticipo(datosNotaPedido.getAnticipo());
+                                    historico.setEntregado(datosNotaPedido.getEntregado());
                                     historico.setFecharegistro(gc.getTime());
                                     historico.setFkidnotapedido(em.find(Notadepedido.class, notape.getId()));
-                                        if(notadepedido.getObservaciones().length()>0){
-                                            historico.setObservaciones(notadepedido.getObservaciones());
+                                        if(datosNotaPedido.getObservaciones().length()>0){
+                                            historico.setObservaciones(datosNotaPedido.getObservaciones());
                                         }else{
                                             historico.setObservaciones("");
                                         }
-                                    historico.setPendiente(notadepedido.getPendiente());
-                                    historico.setPorcentajeaplicado(notadepedido.getPorcentajes().getId_porcentaje());
-                                    historico.setSaldo(notadepedido.getSaldo());
-                                    historico.setTotal(notadepedido.getMontototal());
-                                    historico.setIdusuarioanulo(notadepedido.getId_usuario_anulado());
-                                    historico.setIdusuariocancelo(notadepedido.getUsuario_cancelo_nota());
-                                    historico.setIdusuarioentrega(notadepedido.getUsuario_entregado());
-                                    historico.setPorcentajedesc(notadepedido.getPorc_descuento_total());
-                                    historico.setIdusuarioexpidio(notadepedido.getUsuario_expidio_nota());
-                                    historico.setPorcrecargo(notadepedido.getPorcentajerecargo());
-                                    historico.setTotalapagar(notadepedido.getMontototalapagar());
-                                    historico.setDescuento(notadepedido.getDescuentonota());
-                                    historico.setRecargo(notadepedido.getRecargo());
+                                    historico.setPendiente(datosNotaPedido.getPendiente());
+                                    historico.setPorcentajeaplicado(datosNotaPedido.getPorcentajes().getId_porcentaje());
+                                    historico.setSaldo(datosNotaPedido.getSaldo());
+                                    historico.setTotal(datosNotaPedido.getMontototal());
+                                    historico.setIdusuarioanulo(datosNotaPedido.getId_usuario_anulado());
+                                    historico.setIdusuariocancelo(datosNotaPedido.getUsuario_cancelo_nota());
+                                    historico.setIdusuarioentrega(datosNotaPedido.getUsuario_entregado());
+                                    historico.setPorcentajedesc(datosNotaPedido.getPorc_descuento_total());
+                                    historico.setIdusuarioexpidio(datosNotaPedido.getUsuario_expidio_nota());
+                                    historico.setPorcrecargo(datosNotaPedido.getPorcentajerecargo());
+                                    historico.setTotalapagar(datosNotaPedido.getMontototalapagar());
+                                    historico.setDescuento(datosNotaPedido.getDescuentonota());
+                                    historico.setRecargo(datosNotaPedido.getRecargo());
                                     historico.setHoraregistro(gc.getTime());
-                                    historico.setCancelado(notadepedido.getCancelado());                                
-                                    historico.setAnulado(notadepedido.getAnulado());
+                                    historico.setCancelado(datosNotaPedido.getCancelado());                                
+                                    historico.setAnulado(datosNotaPedido.getAnulado());
                                     historico.setAccion("Historico Almacenado con exito nota de pedido N "+notape.getId());
                     em.persist(historico);                    
                         Query queryFindByIdProducto = em.createNamedQuery("Historiconotapedido.findByFkIdNotaPedido");
@@ -510,7 +511,7 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
                                                         nota.setEnefectivo(datosnotapedido.getEnefectivo());
                                                         nota.setEntregado(datosnotapedido.getEntregado());
                                                         nota.setFkIdcliente(cliente);
-                                                        nota.setAnticipo(datosnotapedido.getAnticipo());                                                        
+                                                        
                                                         nota.setFkidporcentajenotaId(em.find(Porcentajes.class, 
                                                                 datosnotapedido.getPorcentajes().getId_porcentaje()));
                                                         nota.setIdTarjetaFk(em.find(TarjetasCreditoDebito.class, 
@@ -553,14 +554,20 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
                                                                     }
                                                                     if(datosnotapedido.getAnulado()=='1') {
                                                                         nota.setFechaAnulado(gc.getTime());
-                                                                   }                                                
+                                                                   } 
+                                                                     if(datosnotapedido.getAnticipoacum()!=nota.getAnticipo()){            
+                                                                        nota.setAnticipo(datosnotapedido.getAnticipoacum());
+                                                                        almacenarHistorico(datosnotapedido,nota);           
+                                                                     }   
+                                                                    
+                                                                    
                                                    em.persist(nota);  
                                                    procesarControlCaja(datosnotapedido,nota);
                                                    
                                                 List<Itemdetallesnota>lista = datosnotapedido.getDetallesnotapedido().getDetallesnota();
                                                 Query deletsql = em.createNamedQuery("Detallesnotadepedido.deleteById");
                                                 deletsql.setParameter("idNota", nota.getId());
-                                                int retorno = deletsql.executeUpdate();                                                
+                                                deletsql.executeUpdate();                                                
                                                 Query queryDetailsOrders1 = em.createNamedQuery("Detallesnotadepedido.findByFkIdnota");
                                                 queryDetailsOrders1.setParameter("fkIdnota", nota.getId());                                                
                                                  Productos productos;
@@ -580,10 +587,7 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
                                                .setParameter("fkIdnota", nota.getId()).getResultList();
                                                nota.setDetallesnotadepedidoList(queryDetailsOrdersFindIdOrder);
                                                em.merge(nota);
-                                if(datosnotapedido.getAnticipoacum()!=nota.getAnticipo()){            
-                                      nota.setAnticipo(datosnotapedido.getAnticipoacum());
-                                       almacenarHistorico(datosnotapedido,nota);           
-                                }   
+                               
                   result=nota.getId();               
             return result;        
     }
@@ -865,38 +869,60 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
                                 em.persist(notape);
     }
     private void verificarNumeroDeCuponParaInsertarComoEntradaCaja(DatosNotaPedido datosnotapedido,Notadepedido notape){ 
-         if(notape.getEntregado()=='1'||notape.getCancelado()=='1'){
-                   ejbentradasSalidas.calculosPorNumerodeCupon(datosnotapedido.getMontototal(),notape);
-         }else{
-                if(datosnotapedido.getAnticipo()>0&&datosnotapedido.getEnefectivo()=='1'){
-                    ejbentradasSalidas.calculosPorAnticipoNotaPedido(datosnotapedido.getAnticipo(), notape);
-                }else{
-                    if(datosnotapedido.getAnticipo()>0&&datosnotapedido.getEnefectivo()=='0'){
-                        ejbentradasSalidas.calculosPorNumerodeCupon(datosnotapedido.getAnticipo(), notape);
-                    }
-                }
-         }
+         
+                   ejbEntradasSalidas.calculosPorNumerodeCupon(datosnotapedido.getAnticipo(),notape);
+         
+//else{
+//                if(datosnotapedido.getAnticipo()>0&&datosnotapedido.getEnefectivo()=='1'){
+//                    ejbEntradasSalidas.calculosPorAnticipoNotaPedido(datosnotapedido.getAnticipo(), notape);
+//                }else{
+//                    if(datosnotapedido.getAnticipo()>0&&datosnotapedido.getEnefectivo()=='0'){
+//                        ejbEntradasSalidas.calculosPorNumerodeCupon(datosnotapedido.getAnticipo(), notape);
+//                    }
+//                }
+//         }
     }
     private void verificarAnticipoParaInsertarComoEntradaCaja(DatosNotaPedido datos,Notadepedido notape) {            
-                ejbentradasSalidas.calculosPorAnticipoNotaPedido(datos.getAnticipo(),notape);        
+                ejbEntradasSalidas.calculosPorAnticipoNotaPedido(datos.getAnticipo(),notape);        
     }
     private void procesarControlCaja(DatosNotaPedido datosnotapedido, Notadepedido nota) {
         
+        if(datosnotapedido.getAnticipo()>0&&datosnotapedido.getEnefectivoAnticipo()==1){
+                verificarAnticipoParaInsertarComoEntradaCaja(datosnotapedido, nota);
         
-                if(datosnotapedido.getEntregado()=='1'&&datosnotapedido.getCancelado()=='1'&&datosnotapedido.getEnefectivo()==1){
-                        
+        }else{
+            if(datosnotapedido.getAnticipo()>0&&datosnotapedido.getEnefectivoAnticipo()==0){
+                verificarNumeroDeCuponParaInsertarComoEntradaCaja(datosnotapedido, nota);
+            }
         
-                        verificarAnticipoParaInsertarComoEntradaCaja(datosnotapedido,nota);
-                }else{
-                       if(datosnotapedido.getEnefectivo()==1){
+        }
         
-                           verificarNumeroDeCuponParaInsertarComoEntradaCaja(datosnotapedido,nota);
-                       }else{
         
-                           if(datosnotapedido.getNumerodecupon().length()>0){
-                                    verificarAnticipoParaInsertarComoEntradaCaja(datosnotapedido,nota);
-                           }
-                       } 
-                }
+//                if(datosnotapedido.getEntregado()=='1'&&datosnotapedido.getCancelado()=='1'&&datosnotapedido.getEnefectivo()==1){
+//                        
+//        
+//                        verificarAnticipoParaInsertarComoEntradaCaja(datosnotapedido,nota);
+//                }else{
+//
+//                        if(datosnotapedido.getEntregado()=='1'&&datosnotapedido.getCancelado()=='1'&&datosnotapedido.getEnefectivo()==0){
+//                        
+//                            verificarNumeroDeCuponParaInsertarComoEntradaCaja(datosnotapedido, nota);
+//                        
+//                        }else{
+//
+//
+//                                if(datosnotapedido.getEnefectivo()==1){
+//
+//                                    verificarAnticipoParaInsertarComoEntradaCaja(datosnotapedido,nota);
+//                                  //  verificarNumeroDeCuponParaInsertarComoEntradaCaja(datosnotapedido,nota);
+//                                }else{
+//
+//                                    if(datosnotapedido.getNumerodecupon().length()>0){
+//                                          verificarNumeroDeCuponParaInsertarComoEntradaCaja(datosnotapedido,nota);
+//                                             //verificarAnticipoParaInsertarComoEntradaCaja(datosnotapedido,nota);
+//                                    }
+//                                } 
+//                        }
+//                }
         }    
 }

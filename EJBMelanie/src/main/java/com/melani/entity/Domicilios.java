@@ -1,6 +1,5 @@
 package com.melani.entity;
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -16,7 +15,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-
 @Entity
 @Table(name="DOMICILIOS")
 @NamedQueries({
@@ -74,8 +72,8 @@ public class Domicilios implements Serializable {
     @JoinColumn(name = "ID_LOCALIDAD", referencedColumnName = "ID_LOCALIDAD",nullable=false,updatable=false)
     @ManyToOne(fetch=FetchType.LAZY,optional = false)
     private Localidades localidades;
-    @OneToMany(mappedBy = "domicilioss",fetch=FetchType.LAZY)
-    private List<PersonasDomicilios> personasDomicilioss;
+    @OneToMany(mappedBy = "domicilioss",fetch = FetchType.LAZY)
+    private List<PersonasDomicilios> personaDomicilio;
 
     public Domicilios(){}
 
@@ -171,13 +169,15 @@ public class Domicilios implements Serializable {
         this.entrecalleycalle = entrecalleycalle;
     }
 
-    public List<PersonasDomicilios> getPersonasDomicilioss() {
-        return Collections.unmodifiableList(personasDomicilioss);
+    public List<PersonasDomicilios> getPersonaDomicilio() {
+        return personaDomicilio;
     }
 
-    public void setPersonasDomicilioss(List<PersonasDomicilios> personasDomicilioss) {
-        this.personasDomicilioss = personasDomicilioss;
+    public void setPersonaDomicilio(List<PersonasDomicilios> personaDomicilio) {
+        this.personaDomicilio = personaDomicilio;
     }
+
+    
 
     public Barrios getIdbarrio() {
         return idbarrio;

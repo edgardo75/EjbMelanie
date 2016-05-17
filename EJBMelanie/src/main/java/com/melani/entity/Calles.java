@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,7 +32,7 @@ public class Calles implements Serializable {
     @NotNull(message = "El nombre de la Calle es requerido")
     @Pattern(message = "El nombre de Calle no es válido",regexp = "(?=^.{3,100}$)^([\\w\\.\\p{IsLatin}][\\s]?)+$")
     private String descripcion;
-    @OneToMany(mappedBy = "idcalle")
+    @OneToMany(mappedBy = "idcalle",fetch = FetchType.LAZY)
     private List<Domicilios> domicilioss;
 
     public Calles(){}

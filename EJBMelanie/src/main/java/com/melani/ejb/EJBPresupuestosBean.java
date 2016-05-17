@@ -26,11 +26,12 @@ public class EJBPresupuestosBean implements EJBPresupuestosRemote {
     public long addBudgets(String xmlPresupuesto) {
         long retorno;        
             XStream xstream = new XStream(new StaxDriver());
+            ProjectHelpers xmlParser = new ProjectHelpers();
                 xstream.alias("presupuesto", DatosPresupuestos.class);
                 xstream.alias("detallepresupuesto", DetallesPresupuesto.class);
                 xstream.alias("itemdetallespresupuesto", ItemDetallesPresupuesto.class);
                 xstream.addImplicitCollection(DetallesPresupuesto.class, "lista");
-            DatosPresupuestos datospresupuesto = (DatosPresupuestos) xstream.fromXML(ProjectHelpers.parsearCaracteresEspecialesXML(xmlPresupuesto));
+            DatosPresupuestos datospresupuesto = (DatosPresupuestos) xstream.fromXML(xmlParser.parsearCaracteresEspecialesXML(xmlPresupuesto));
             retorno = almacenarPresupuesto(datospresupuesto);        
             return retorno;        
     }

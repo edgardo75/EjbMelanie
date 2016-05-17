@@ -39,7 +39,7 @@ public class HistoricoDatosClientes implements Serializable {
     private double totalCompras;
     @Column(precision = 15,name = "TOTALPUNTOS")
     private int totalEnPuntos;
-    @ManyToOne()
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     @PrimaryKeyJoinColumn
     private Clientes cliente;
 

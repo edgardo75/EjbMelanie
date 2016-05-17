@@ -22,8 +22,10 @@ public class EJBDomicilios implements EJBDomiciliosRemote {
     private long idDomicilio=0; 
     @Override
  public long addDomicilios(DatosDomicilios datosDomicilio) {
-        long retorno;        
-            idDomicilio= existe(datosDomicilio);
+        long retorno = 0; 
+        
+        
+            idDomicilio= existe(datosDomicilio);            
                switch((int)idDomicilio){
                     case 0:{                    
                             retorno = procesarAddDomicilio(datosDomicilio);                            
@@ -38,6 +40,7 @@ public class EJBDomicilios implements EJBDomiciliosRemote {
                     break;
                 }
             }       
+        
             return retorno;
        
     }    

@@ -2,7 +2,6 @@ package com.melani.entity;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -38,8 +37,7 @@ import javax.persistence.TableGenerator;
 @NamedQuery(name = "Personas.searchByNroDocuAndPertype",query = "SELECT p FROM Personas p WHERE p.nrodocumento = :nrodocumento and " +
                     "p.pertype = :pertype")})
 public class Personas implements Serializable {
-    private static final long serialVersionUID = 1L;
-    
+    private static final long serialVersionUID = 1L;    
     @TableGenerator(name="PersonaIdGen", table="ID_GEN_PER",
     pkColumnName="FNAME",pkColumnValue="Personas", valueColumnName="FKEY",
     allocationSize=1)
@@ -61,11 +59,10 @@ public class Personas implements Serializable {
     protected Integer nrodocumento;
     @JoinColumn(name="ID",referencedColumnName="ID",nullable=false,updatable=false)
     @ManyToOne(fetch=FetchType.LAZY,optional = false)
-    private Tiposdocumento tipodocumento;
-    @OneToMany(mappedBy = "personas")
-    private List<PersonasDomicilios> personasDomicilioss;
-    @CollectionTable
-    @OneToMany(mappedBy = "idPersona")
+    private Tiposdocumento tipodocumento;    
+    @OneToMany(mappedBy = "personas",fetch = FetchType.LAZY)
+    private List<PersonasDomicilios> personasDomicilioss;    
+    @OneToMany(mappedBy = "idPersona",fetch = FetchType.LAZY)
     private List<Personastelefonos> personastelefonoss;
     @JoinColumn(name = "ID_GENERO", referencedColumnName = "ID_GENERO")
     @ManyToOne(fetch=FetchType.LAZY,optional = false)
@@ -204,13 +201,13 @@ public class Personas implements Serializable {
                         .append(this.getGeneros().getDescripcion()).append("</generoDescripcion>\n")
                         .append("</Genero>\n").append("<email>").append(this.getEmail()).append("</email>\n");
                 item.append("<personadomicilio>\n");
-                    if(this.getPersonasDomicilioss().isEmpty()) {
+                   if(this.getPersonasDomicilioss().isEmpty()) {
                         item.append("</personadomicilio>\n");
-        } else{
-                        List<PersonasDomicilios>lista = this.getPersonasDomicilioss();
-            for (PersonasDomicilios personasDomicilios : lista) {
-                item.append(personasDomicilios.toXML());
-            }
+                    } else{
+                            List<PersonasDomicilios>lista = this.getPersonasDomicilioss();
+                                    for (PersonasDomicilios personasDomicilios : lista) {
+                                        item.append(personasDomicilios.toXML());
+                                    }
                         item.append("</personadomicilio>\n");
                     }
                 item.append("<personatelefono>\n");

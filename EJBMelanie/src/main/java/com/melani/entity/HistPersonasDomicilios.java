@@ -33,7 +33,7 @@ public class HistPersonasDomicilios implements Serializable {
     private Date fechadecambio;
     @Column(name="IDUSUARIO")
     private Integer idusuario;
-    @ManyToOne()
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     @PrimaryKeyJoinColumns(value = @PrimaryKeyJoinColumn)    
     private PersonasDomicilios personaDomicilio;
 

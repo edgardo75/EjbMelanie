@@ -20,7 +20,7 @@ import javax.persistence.Temporal;
                @NamedQuery(name = "Empleados.chkpass",query ="SELECT e FROM Empleados e WHERE e.idPersona = ?1")})
 public class Empleados extends Personas {
 
-    @Column(name="PASSWORD",nullable=false)    
+    @Column(name="PASSWORD",nullable=false,length = 100)    
     protected String password;
 
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
@@ -34,6 +34,9 @@ public class Empleados extends Personas {
 
     @Column(name="ESTADO")
      protected Short estado;
+    
+    @Column(name = "KEYPASSWORD",length = 100,nullable = false)
+    protected String keyPassword;
    
     public Empleados(){}
 
@@ -75,6 +78,14 @@ public class Empleados extends Personas {
 
     public void setEstado(Short estado) {
         this.estado = estado;
+    }
+
+    public String getKeyPassword() {
+        return keyPassword;
+    }
+
+    public void setKeyPassword(String keyPassword) {
+        this.keyPassword = keyPassword;
     }
 
     public String toXMLEmpleado(){

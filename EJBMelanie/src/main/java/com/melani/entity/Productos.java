@@ -54,9 +54,9 @@ public class Productos implements Serializable {
     private Date fecha;    
     @OneToMany(mappedBy = "productos",orphanRemoval = true,fetch = FetchType.LAZY)
     private List<ExistenciasProductos> existenciasProductoss;
-    @OneToMany(mappedBy = "productos")
+    @OneToMany(mappedBy = "productos",fetch = FetchType.LAZY)
     private List<Detallesnotadepedido> detallesnotadepedidoList;
-    @OneToMany( mappedBy = "productos")
+    @OneToMany( mappedBy = "productos",fetch = FetchType.LAZY)
     private List<Detallespresupuesto> detallepresupuestosList;
     @OneToMany(mappedBy = "productos",fetch = FetchType.LAZY)
     private List<ImagenesProductos>imagenesProductosList;

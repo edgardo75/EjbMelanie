@@ -20,11 +20,10 @@ public class EJBClienteDomicilio implements EJBClienteDomicilioRemote {
     @Override
     public String addRelacionClienteDomicilio(long idCliente, long idDomicilio,int idUsuario) {
         String retorno = "NADA";
-        
-            if((idDomicilio>0) && (idCliente>0)&&idUsuario>=0){
+            
+            if((idDomicilio>0) && (idCliente>0)){
                     GregorianCalendar calendario = new GregorianCalendar(Locale.getDefault());
-                    PersonasdomiciliosPK perpk = new PersonasdomiciliosPK(idDomicilio, idCliente);
-                        renovarDomicilio(idCliente,idUsuario);                    
+                    PersonasdomiciliosPK perpk = new PersonasdomiciliosPK(idDomicilio, idCliente);                        
                         PersonasDomicilios personadomicilio = new PersonasDomicilios();
                         personadomicilio.setDomicilioss(em.find(Domicilios.class, idDomicilio));
                         personadomicilio.setEstado("Habitable".toUpperCase());
@@ -35,9 +34,9 @@ public class EJBClienteDomicilio implements EJBClienteDomicilioRemote {
                         retorno ="InyectóRelacion";
             }
         return retorno;        
-    }
-  
-private void renovarDomicilio(long idCliente,int idUsuario) {
+    }  
+    @Override
+    public void renovarDomicilio(long idCliente,int idUsuario) {
                     Query consulta = em.createQuery("SELECT p FROM PersonasDomicilios p WHERE p.personasdomiciliosPK.idPersona = :idPersona");
                     consulta.setParameter("idPersona", idCliente);
                     List<PersonasDomicilios>lista= consulta.getResultList();                    

@@ -22,7 +22,6 @@ import javax.persistence.Table;
                                             "t.telefonosPK.numero = :numero")})
     public class Telefonos implements Serializable {
     private static final long serialVersionUID = 1L;
-
     @EmbeddedId
     protected TelefonosPK telefonosPK;
     @JoinColumn(name = "ID_EMPRESATELEFONIA", referencedColumnName = "ID_EMP_TELEFONIA", nullable = false)
@@ -31,7 +30,7 @@ import javax.persistence.Table;
     @JoinColumn(name = "ID_TIPOTELEFONO", referencedColumnName = "ID_TIPOTEL")
     @ManyToOne(fetch=FetchType.LAZY)
     private Tipostelefono idTipotelefono;
-     @OneToMany(mappedBy = "telefonos")
+     @OneToMany(mappedBy = "telefonos",fetch = FetchType.LAZY)
     private List<Personastelefonos> personastelefonosCollection;
 
     public Telefonos() {

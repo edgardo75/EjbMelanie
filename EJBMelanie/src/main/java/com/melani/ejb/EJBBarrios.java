@@ -56,11 +56,13 @@ public class EJBBarrios implements EJBBarriosRemote {
                                 }else{
                                     StringBuilder xmlLoop = new StringBuilder(32);
                                     for (Barrios barrios : lista) {
+                                        
                                         try {
                                             xmlLoop.append(barrios.toXML());
                                         } catch (UnsupportedEncodingException ex) {
-                                            Logger.getLogger(ex.getMessage());
+                                            Logger.getLogger(EJBBarrios.class.getName()).log(Level.SEVERE, null, ex);
                                         }
+                                        
                                 }                                
                                     xml+=xmlLoop;
                                 }                         

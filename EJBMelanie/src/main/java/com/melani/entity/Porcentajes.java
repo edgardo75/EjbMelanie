@@ -41,7 +41,7 @@ public class Porcentajes implements Serializable {
     
     @Column(name = "VALOR",precision=10,scale=2)
     private Double valor;
-    @OneToMany(mappedBy = "fkidporcentajenotaId")
+    @OneToMany(mappedBy = "fkidporcentajenotaId",fetch = FetchType.LAZY)
     private List<Notadepedido> notadepedidoList;
 
     public Porcentajes() {

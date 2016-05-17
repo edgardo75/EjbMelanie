@@ -6,5 +6,5 @@ public interface EJBClientesRemote {
     String obtenerClienteXTipoAndNumeroDocu(short idTipo, int nrodDocu);
     String getCustomerDocNumber(Integer docNumber);
     String searchClientForNameAndLastName(String name,String lastname);
-    String addClienteDatosPersonales(String datospersonalescliente);
+//    String addClienteDatosPersonales(String datospersonalescliente);
 }

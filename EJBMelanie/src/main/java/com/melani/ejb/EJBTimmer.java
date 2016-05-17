@@ -27,20 +27,22 @@ import javax.persistence.Query;
 public class EJBTimmer {
     @PersistenceContext(unitName = "EJBMelaniPU2")
     EntityManager em;    
-    @Schedule(persistent = false,timezone = "America/Argentina/San_Juan",second = "30",hour = "21",minute = "00")
+    final String servidorSMTP = ResourceBundle.getBundle("email").getString("mail.smtp.host");                
+    final String puertoEnvio = ResourceBundle.getBundle("email").getString("mail.smtp.port");
+    Session ses = null;    
+    @Schedule(persistent = false,timezone = "America/Argentina/San_Juan",second = "00",hour = "21",minute = "30")            
     private void ventasDiarias(){ 
-        final String servidorSMTP = ResourceBundle.getBundle("email").getString("mail.smtp.host");                
-        final String puertoEnvio = ResourceBundle.getBundle("email").getString("mail.smtp.port");
-                    Properties props = new Properties();
-                    props.put("mail.smtp.host", servidorSMTP);
+         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+          Query consulta = em.createQuery("SELECT SUM(n.montototalapagar) FROM Notadepedido n WHERE cast(n.fechadecompra as DATE) = CURRENT_DATE");
+        
+                    Properties props = new Properties();                    
+                    props.put("mail.host", servidorSMTP);
                     props.put("mail.smtp.port", puertoEnvio);
                     props.put("mail.smtp.starttls.enable", "true");
                     props.put("mail.transport.protocol","smtp");
                     props.put("mail.smtp.auth", "true");                  
-                    try {
+                    try {     
                         
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                        Query consulta = em.createQuery("SELECT SUM(n.montototalapagar) FROM Notadepedido n WHERE cast(n.fechadecompra as DATE) = CURRENT_DATE");
                    Session session = Session.getInstance(props, new Authenticator() {
                         @Override
                         protected PasswordAuthentication getPasswordAuthentication(){
@@ -71,14 +73,15 @@ public class EJBTimmer {
                             @Override
                             public void run() {
                                 try {                                                                        
-                                    Transport.send(message);                                                                     
+                                    Transport.send(message);  
+                                    
                                 } catch (MessagingException ex) {
                                     java.util.logging.Logger.getLogger(EJBTimmer.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                             }
                         }).start();
                     } catch (MessagingException ex) {
-                       Logger.getLogger("Error en EJBTimmer");
+                       Logger.getLogger("Error en EJBTimmer "+ex.getMessage());
                     }
     }    
     public String obtenerIPAddress() {       

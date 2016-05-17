@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,10 +41,10 @@ public class Localidades implements Serializable {
     @NotNull(message = "El nombre de la Localidad es requerido")
     @Pattern(message = "El nombre de Localidad no es válido",regexp = "(?=^.{3,100}$)^([\\w\\.\\p{IsLatin}][\\s]?)+$")
     private String descripcion;    
-    @OneToMany( mappedBy = "localidades")
+    @OneToMany( mappedBy = "localidades",fetch = FetchType.LAZY)
     private List<Domicilios> domiciliosList;
     @JoinColumn(name = "ID_PROVINCIA", referencedColumnName = "ID_PROVINCIA")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     private Provincias provincias;
     @Column(name = "LATITUD",columnDefinition = "VARCHAR(15) DEFAULT '0'",nullable = false)
     @NotNull()

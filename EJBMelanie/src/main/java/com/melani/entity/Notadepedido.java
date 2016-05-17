@@ -115,13 +115,13 @@ public class Notadepedido implements Serializable {
     @OneToMany(mappedBy = "fkidnotapedido",orphanRemoval = true,cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private List<Historiconotapedido> historiconotapedidoList;
     @JoinColumn(name = "IDTARJETAFK_IDTARJETA", referencedColumnName = "IDTARJETA")
-    @ManyToOne(optional = false,fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER,optional = false)
     private TarjetasCreditoDebito idTarjetaFk;
     @JoinColumn(name = "FK_IDCLIENTE", referencedColumnName = "ID_PERSONA")
-    @ManyToOne(optional = false,fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
     private Personas fkIdcliente;
     @JoinColumn(name = "FKIDPORCENTAJENOTA_ID", referencedColumnName = "ID_PORCENTAJES")
-    @ManyToOne(optional = false,fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
     private Porcentajes fkidporcentajenotaId;
     @Column(name="CANCELADO",length=1)
     private Character cancelado;

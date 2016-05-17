@@ -15,6 +15,7 @@ import com.melani.utils.DatosDomicilios;
 import com.melani.utils.DatosTelefonos;
 import com.melani.utils.ListaTelefonos;
 import com.melani.utils.ProjectHelpers;
+import com.melani.utils.ValidateClientandUserData;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import java.util.GregorianCalendar;
@@ -31,8 +32,8 @@ import javax.persistence.Query;
 @Stateless(name="ejb/EJBClientes")
 @WebService(serviceName="ServiceClientes",name="ClientesWs")
 public class EJBClientes implements EJBClientesRemote {    
-    @PersistenceContext(unitName="EJBMelaniPU2")
-    private EntityManager em;
+    @PersistenceContext()   
+    private EntityManager em;              
     @EJB
     EJBDomiciliosRemote ejbdomici;
     @EJB
@@ -42,22 +43,31 @@ public class EJBClientes implements EJBClientesRemote {
     @EJB
     EJBClienteTelefonoRemote ejbclitel;
     private volatile long chequear__email_numDoc=0L;
-        public long addCliente(String xmlClienteDomicilioTelefono) {
-        long retorno;
-        Personas persona = null;       
+    ValidateClientandUserData validateDataUser;
+    String nombreyApellidoPattern;
+    String numberPattern_Dni;
+    String email_Pattern;
+    String telefonoPattern;
+    String prefijoPattern;
+    public EJBClientes() {
+        this.nombreyApellidoPattern = "(?=^.{1,30}$)[[A-Z][a-z]\\p{IsLatin}]* ?[[a-zA-Z]\\p{IsLatin}]* ?[[a-zA-Z]\\p{IsLatin}]+$";
+        this.numberPattern_Dni="(?=^.{1,10}$)\\d+$";
+        this.email_Pattern="^[\\w\\-\\+\\*]+[\\w\\S]@(\\w+\\.)+[\\w]{2,4}$";
+        this.telefonoPattern ="^(4|15)(\\d){6,}+$";
+        this.prefijoPattern ="^(\\d){1,8}+$";     
+        validateDataUser = new ValidateClientandUserData();
+    }    
+        public String addCliente(String xmlClienteDomicilioTelefono) {
+        long retorno=0; 
+        Personas persona = null; 
+        StringBuilder xmlCliente = new StringBuilder(32);
             ClienteDomicilioTelefono getAllDatos = parsear_a_objetos(xmlClienteDomicilioTelefono);
              DatosCliente datosClientePersonales = getAllDatos.getCliente();
-          
-             if(ProjectHelpers.NombreyApellidoValidator.validate(datosClientePersonales.getNombre())){
-             
-                 if(ProjectHelpers.NombreyApellidoValidator.validate(datosClientePersonales.getApellido())){
-             
-                    String numeroDocu = String.valueOf(datosClientePersonales.getNrodocu());
-             
-                     if(ProjectHelpers.NumeroDocumentoValidator.validate(numeroDocu)){
-                     
-                         long idPersona = existePersona(datosClientePersonales.getNrodocu());
-                         
+            if(validateDataUser.validate(datosClientePersonales.getNombre(), nombreyApellidoPattern)){             
+                 if(validateDataUser.validate(datosClientePersonales.getApellido(),nombreyApellidoPattern)){             
+                    String numeroDocu = String.valueOf(datosClientePersonales.getNrodocu());             
+                     if(validateDataUser.validate(numeroDocu,numberPattern_Dni)){                     
+                         long idPersona = existePersona(datosClientePersonales.getNrodocu());                         
                                 if(idPersona>0) {
                                     persona = em.find(Personas.class, idPersona);
                                 }             
@@ -78,7 +88,7 @@ public class EJBClientes implements EJBClientesRemote {
                                                retorno = chequear__email_numDoc;
                                                 break;
                                                }
-                                               default:{
+                                               default:{                                                   
                                                      if(persona!=null){
                                                             retorno = buscarPersonaSiEsCliente(persona, datosClientePersonales, 
                                                             getAllDatos, xmlClienteDomicilioTelefono);
@@ -109,8 +119,20 @@ public class EJBClientes implements EJBClientesRemote {
              }else{
                  retorno = -12;
                  Logger.getLogger("Nombre no válido");
-             }        
-            return retorno;        
+             } 
+           
+             if(retorno>0){
+                 xmlCliente.append("<Lista>\n");
+                       Clientes cliente = em.find(Clientes.class, retorno);
+                       xmlCliente.append("<item>\n").append("<id>").append(cliente.getIdPersona())
+                               .append("</id>").append("<nrodocu>").append(cliente.getNrodocumento()).append("</nrodocu>")
+                               .append("<nombre>").append(cliente.getNombre()).append("</nombre>").append("<apellido>")
+                               .append(cliente.getApellido()).append("</apellido>").append("</item>\n").append("</Lista>\n");
+                       return xmlCliente.toString();
+             }else{
+                 return String.valueOf(retorno);        
+             }
+                
     }       
     private long buscarPersonaSiEsCliente(Personas persona,DatosCliente datosClientePersonales,
             ClienteDomicilioTelefono todosDatos,String xmlClienteDomicilioTelefono){
@@ -236,11 +258,11 @@ private long actualizarDatos(ClienteDomicilioTelefono todosDatos,
                              break;
                         }
                         case -1:{
-                            result+="<result>ERROR EN METODO EXISTEPersona</result>\n";                        
+                            result+="<result>ERROR EN METODO EXISTE Persona</result>\n";                        
                              break;
                         }
-                        default:{
-                            Clientes cliente = em.find(Clientes.class, idPersona);           
+                        default:{                            
+                            Clientes cliente = em.find(Clientes.class, idPersona);                  
                                     if(cliente != null){
                                         result+="<item>\n";
                                         result+=cliente.toXML();
@@ -252,13 +274,16 @@ private long actualizarDatos(ClienteDomicilioTelefono todosDatos,
             }           
             return result+="</Lista>\n";        
     }
-
 private long guardarDomicilioyTelefonoCliente(String xmlClienteDomicilioTelefono,Clientes cliente, ClienteDomicilioTelefono todosDatos) {
         long retorno;
-        long idDomicilio;       
-           if(xmlClienteDomicilioTelefono.contains("<Domicilio>")){
-                        idDomicilio = ejbdomici.addDomicilios(todosDatos.getDomicilio());                 
-                                String result=null;                            
+        long idDomicilio; 
+        String result="";          
+           if(xmlClienteDomicilioTelefono.contains("<Domicilio>")){               
+               if(todosDatos.getDomicilio().getDomicilioId()>0){
+                   idDomicilio=todosDatos.getDomicilio().getDomicilioId();
+                   result= encontrarRelacion(idDomicilio, cliente, todosDatos.getIdusuario());                   
+               }else{                    
+                        idDomicilio = ejbdomici.addDomicilios(todosDatos.getDomicilio());                                                                           
                                switch((int)idDomicilio){
                                    case -1:{Logger.getLogger("Error No se pudo agregar domicilio Verifique!!!");
                                    retorno = -1;
@@ -273,37 +298,25 @@ private long guardarDomicilioyTelefonoCliente(String xmlClienteDomicilioTelefono
                                    retorno = -3;
                                    break;}
                                    default:{
-                                       String consulta="SELECT p FROM PersonasDomicilios p "
-                                               + "WHERE p.personasdomiciliosPK.idPersona = :idPersona and "
-                                               + "p.personasdomiciliosPK.iddomicilio = :iddomicilio";
-                                       Query sqlPD = em.createQuery(consulta);
-                                       sqlPD.setParameter("idPersona", cliente.getIdPersona());
-                                       sqlPD.setParameter("iddomicilio", idDomicilio);            
-                                       switch(sqlPD.getResultList().size()){
-                                           case 0:{
-                                            result= ejbclidom.addRelacionClienteDomicilio(cliente.getIdPersona(), idDomicilio,todosDatos.getIdusuario());
-                                            break;
-                                           }                                           
-                                           case 1:{
-                                               result="Relacion Encontrada PD";
-                                               break;
-                                           }
-                                       }
-                                       break;
+                                       result = encontrarRelacion(idDomicilio,cliente,todosDatos.getIdusuario());
+                                       
                                    }
                                }
+               }//end else
                                 if(result.contains("InyectóRelacion")){
                                     List<PersonasDomicilios>listaPD = em.createQuery("SELECT p FROM PersonasDomicilios p "
                                             + "WHERE p.personasdomiciliosPK.idPersona = :idPersona").setParameter("idPersona",
                                                     cliente.getIdPersona()).getResultList(); 
                                     cliente.setPersonasDomicilioss(listaPD);
                                     Domicilios domici = em.find(Domicilios.class, idDomicilio);
-                                    domici.setPersonasDomicilioss(listaPD);
+                                    domici.setPersonaDomicilio(listaPD);
                                     em.persist(domici);
                                     em.persist(cliente);
                                 } 
-           }             
-                    if(xmlClienteDomicilioTelefono.contains("<telefono>")){            
+           }            
+           
+                    if(xmlClienteDomicilioTelefono.contains("<telefono>")){  
+                        
                            if(todosDatos.getListaTelefonos().getList().size()>0){            
                                Iterator iter = todosDatos.getListaTelefonos().getList().iterator();
                                String resultTC="";
@@ -311,8 +324,7 @@ private long guardarDomicilioyTelefonoCliente(String xmlClienteDomicilioTelefono
                                while (iter.hasNext())
                                {    
                                     datosTel = (DatosTelefonos) iter.next();
-                                    if(ProjectHelpers.TelefonoValidator.validateTelefono(datosTel.getNumero())&&
-                                            ProjectHelpers.TelefonoValidator.validatePrefijo(datosTel.getPrefijo())){
+                                    if(validateDataUser.validate(datosTel.getNumero(),telefonoPattern)&&validateDataUser.validate(datosTel.getPrefijo(),prefijoPattern)){
                                                 long rettelefono = ejbtele.addTelefonos(datosTel);
                                                 if(rettelefono==2){
                                                     resultTC = ejbclitel.addClienteTelefono(datosTel.getNumero(), 
@@ -342,6 +354,7 @@ private long guardarDomicilioyTelefonoCliente(String xmlClienteDomicilioTelefono
                                            em.persist(cliente);                              
                       }                         
                     }
+                    
                 retorno = cliente.getIdPersona();        
            return retorno;       
     }
@@ -375,7 +388,7 @@ private long guardarDomicilioyTelefonoCliente(String xmlClienteDomicilioTelefono
     public long chequearEmail(String email,Integer nrodocu) {
         long retorno = -6;       
             if(!email.isEmpty()&&nrodocu>0){
-                if(ProjectHelpers.EmailValidator.validate(email)){
+                if(validateDataUser.validate(email,email_Pattern)){
                     Query sqlemail = em.createNamedQuery("Personas.searchByEmailAndNroDocu");
                                 sqlemail.setParameter("email", email.toLowerCase());
                                 sqlemail.setParameter("nrodocumento", nrodocu);
@@ -420,7 +433,9 @@ private long guardarDomicilioyTelefonoCliente(String xmlClienteDomicilioTelefono
     }    
     private ClienteDomicilioTelefono parsear_a_objetos(String xmlClienteDomicilioTelefono){
         ClienteDomicilioTelefono datoscliente;
+        ProjectHelpers xmlParser = new ProjectHelpers();
              XStream  xstream = new XStream(new StaxDriver());
+             
                xstream.alias("ClienteDomicilioTelefono",ClienteDomicilioTelefono.class);
                 xstream.alias("item", DatosCliente.class);                      
                     if(xmlClienteDomicilioTelefono.contains("<Domicilio>")) {
@@ -432,72 +447,108 @@ private long guardarDomicilioyTelefonoCliente(String xmlClienteDomicilioTelefono
                         xstream.addImplicitCollection(ListaTelefonos.class,"list");
                     }        
                     datoscliente = (ClienteDomicilioTelefono) 
-                            xstream.fromXML(ProjectHelpers.parsearCaracteresEspecialesXML1(xmlClienteDomicilioTelefono));                                          
+                            xstream.fromXML(xmlParser.parsearCaracteresEspecialesXML1(xmlClienteDomicilioTelefono));                                          
             return datoscliente;        
     }   
-    @Override
-    public String addClienteDatosPersonales(String datospersonalescliente) {
-        long idcliente =0L;
-        String xml = "<Lista>\n";        
-            ClienteDomicilioTelefono getAllDatos=parsear_a_objetos(datospersonalescliente);
-            DatosCliente getcliente = getAllDatos.getCliente();
-           if(ProjectHelpers.NombreyApellidoValidator.validate(getcliente.getNombre())){
-               if(ProjectHelpers.NombreyApellidoValidator.validate(getcliente.getApellido())){
-                  if(ProjectHelpers.NumeroDocumentoValidator.validate(String.valueOf(getcliente.getNrodocu()))){              
-                       chequear__email_numDoc = chequearEmail(getcliente.getEmail(),getcliente.getNrodocu());
-                            switch((int)chequear__email_numDoc){
-                                     case -7:{Logger.getLogger("Error en metodo chequear email");
-                                         xml+="<error>Error en metodo chequear email</error>\n";
-                                         break;
-                                      }
-                                     case -8:{Logger.getLogger("Email encontrado en metodo chequearEmail");
-                                         xml+="<info>Email encontrado en metodo chequearEmail<info>\n";
-                                       break;
-                                      }
-                                      case -11:{Logger.getLogger("Email no válido");
-                                                 xml+="<error>Email no válido<error>\n";
-                                          break;
-                                      }
-                              default:{               
-                                         idcliente= existePersona(getcliente.getNrodocu());
-                                             switch((int)idcliente){
-                                                 case 0:{
-                                                         idcliente =agregarTodosLosDatosCliente(getAllDatos,getcliente,datospersonalescliente);                                              
-                                                     }
-                                                     break;                                        
-                                                         case -1:{                 
-                                                             Logger.getLogger("Fallo error al buscar cliente en metodo existe");
-                                                          xml+="<error>Fallo error al buscar cliente en metodo existe</error>\n";
-                                                         break;
-                                                     }
-                                                 default:{                 
-                                                         idcliente = actualizarDatos(getAllDatos,getcliente,datospersonalescliente,idcliente);                                                        
-                                                         break;
-                                                     }
-                                             }
-                              }
-                            }//end switch
-                   }else{
-                             Logger.getLogger("El documento no es válido");
-                         xml+="<error>El documento no es válido<error>\n";
-                   }
-                   
-               }else{
-                         Logger.getLogger("El apellido no es válido");
-                         xml+="<error>El apellido no es válido<error>\n";
-                 }
-            }else{
-               Logger.getLogger("El nombre no es válido");
-               xml+="<error>El nombre no es válido<error>\n";
-            }
-            if(idcliente>0){
-                       Clientes cliem = em.find(Clientes.class, idcliente);
-                       xml+="<item>\n";
-                       xml+=cliem.toXML();
-                       xml+=cliem.toXMLCLI();
-                       xml+="</item>\n";
-             }        
-            xml+="</Lista>\n";
-            return xml;        
+//    @Override
+//    public String addClienteDatosPersonales(String datospersonalescliente) {
+//        long idcliente =0L;
+//        
+//        String xml = "<Lista>\n";        
+//        
+//            ClienteDomicilioTelefono getAllDatos=parsear_a_objetos(datospersonalescliente);
+//            DatosCliente getcliente = getAllDatos.getCliente();
+//           if(validateDataUser.validate(getcliente.getNombre(),nombreyApellidoPattern)){
+//        
+//               if(validateDataUser.validate(getcliente.getApellido(),nombreyApellidoPattern)){
+//        
+//                  if(validateDataUser.validate(String.valueOf(getcliente.getNrodocu()),numberPattern_Dni)){              
+//        
+//                       chequear__email_numDoc = chequearEmail(getcliente.getEmail(),getcliente.getNrodocu());
+//        
+//                            switch((int)chequear__email_numDoc){
+//                                     case -7:{Logger.getLogger("Error en metodo chequear email");
+//                                         xml+="<error>Error en metodo chequear email</error>\n";
+//                                         break;
+//                                      }
+//                                     case -8:{Logger.getLogger("Email encontrado en metodo chequearEmail");
+//                                         xml+="<info>Email encontrado en metodo chequearEmail<info>\n";
+//                                       break;
+//                                      }
+//                                      case -11:{Logger.getLogger("Email no válido");
+//                                                 xml+="<error>Email no válido<error>\n";
+//                                          break;
+//                                      }
+//                              default:{     
+//                        
+//                                         idcliente= existePersona(getcliente.getNrodocu());
+//                        
+//                                             switch((int)idcliente){
+//                                                 case 0:{
+//                        
+//                                                         idcliente =agregarTodosLosDatosCliente(getAllDatos,getcliente,datospersonalescliente);                                              
+//                                                     }
+//                                                     break;                                        
+//                                                     
+//                                                         case -1:{                 
+//                        
+//                                                             Logger.getLogger("Fallo error al buscar cliente en metodo existe");
+//                                                          xml+="<error>Fallo error al buscar cliente en metodo existe</error>\n";
+//                                                         break;
+//                                                     }
+//                                                 default:{                 
+//                                                         idcliente = actualizarDatos(getAllDatos,getcliente,datospersonalescliente,idcliente);                                                        
+//                                                         break;
+//                                                     }
+//                                             }
+//                              }
+//                            }//end switch
+//                   }else{
+//                             Logger.getLogger("El documento no es válido");
+//                         xml+="<error>El documento no es válido<error>\n";
+//                   }
+//                   
+//               }else{
+//                         Logger.getLogger("El apellido no es válido");
+//                         xml+="<error>El apellido no es válido<error>\n";
+//                 }
+//            }else{
+//               Logger.getLogger("El nombre no es válido");
+//               xml+="<error>El nombre no es válido<error>\n";
+//            }
+//            if(idcliente>0){
+//                       Clientes cliem = em.find(Clientes.class, idcliente);
+//                       xml+="<item>\n";
+//                       xml+=cliem.toXML();
+//                       xml+=cliem.toXMLCLI();
+//                       xml+="</item>\n";
+//             }        
+//            xml+="</Lista>\n";
+//            
+//            return xml;        
+//    }
+    private String encontrarRelacion(long idDomicilio, Clientes cliente,int idUsuario) {
+        String result = "";
+          String consulta="SELECT p FROM PersonasDomicilios p "
+                                               + "WHERE p.personasdomiciliosPK.idPersona = :idPersona and "
+                                               + "p.personasdomiciliosPK.iddomicilio = :iddomicilio";
+                                       Query sqlPD = em.createQuery(consulta);
+                                       sqlPD.setParameter("idPersona", cliente.getIdPersona());
+                                       sqlPD.setParameter("iddomicilio", idDomicilio);            
+                                       switch(sqlPD.getResultList().size()){
+                                           case 0:{
+                                            result= ejbclidom.addRelacionClienteDomicilio(cliente.getIdPersona(), idDomicilio,idUsuario);
+                                            break;
+                                           }                                           
+                                           default:{                                              
+                                                       //"Relacion Encontrada PD";
+                                                   ejbclidom.renovarDomicilio(cliente.getIdPersona(), idUsuario);
+                                                   result= ejbclidom.addRelacionClienteDomicilio(cliente.getIdPersona(), idDomicilio,idUsuario);
+                                               break;
+                                           }
+                                       }
+                                       return result;
     }
+
+    
 }

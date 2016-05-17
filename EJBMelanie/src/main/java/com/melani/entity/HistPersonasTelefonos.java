@@ -30,7 +30,7 @@ public class HistPersonasTelefonos implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date fechacambio;
     private Integer idusuario;
-    @ManyToOne
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     @PrimaryKeyJoinColumns(value = @PrimaryKeyJoinColumn)
     private Personastelefonos personaTelefono;
 

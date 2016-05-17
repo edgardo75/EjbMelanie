@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,7 +27,7 @@ public class ImagenesProductos implements Serializable{
     allocationSize=1)
     @Column(name = "ID_IMAGE")    
     private int idImagenProducto;
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     private Productos productos;
     @Column(name = "PATHIMAGEN")
     private String pathImagenEnDisco;

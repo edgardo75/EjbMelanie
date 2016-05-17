@@ -4,6 +4,7 @@ import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -46,10 +47,10 @@ public class Detallesnotadepedido implements Serializable {
     @Column(name = "IVA")
     private double iva;
     @JoinColumn(name = "FK_IDNOTA", referencedColumnName = "ID", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     private Notadepedido notadepedido;
     @JoinColumn(name = "FK_IDPRODUCTO", referencedColumnName = "SID", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     private Productos productos;
     @Column(name = "ANULADO")
     private Character anulado;

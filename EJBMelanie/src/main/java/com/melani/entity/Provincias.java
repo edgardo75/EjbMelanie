@@ -28,7 +28,7 @@ public class Provincias implements Serializable {
     private String provincia;
     @Column(name = "CODIGO")
     private Character codigo;
-    @OneToMany(orphanRemoval = true, mappedBy = "provincias")
+    @OneToMany(orphanRemoval = true, mappedBy = "provincias",fetch = FetchType.LAZY)
     private List<Localidades> localidadesList;
 
     public Provincias() {

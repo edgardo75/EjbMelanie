@@ -77,8 +77,8 @@ public class EntradasySalidasCaja implements Serializable {
     @Temporal(TemporalType.TIME)
     private Date hora;
     @JoinColumn(name = "ID_TARJETA_FK", referencedColumnName = "IDTARJETA")
-    @ManyToOne(optional = false)
-    private TarjetasCreditoDebito idTarjetaCreditoDebitoFk;
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
+    private TarjetasCreditoDebito idTarjetaFk;
 
     public EntradasySalidasCaja() {
     }
@@ -184,11 +184,11 @@ public class EntradasySalidasCaja implements Serializable {
     }
 
     public TarjetasCreditoDebito getIdTarjetaCreditoDebitoFk() {
-        return idTarjetaCreditoDebitoFk;
+        return idTarjetaFk;
     }
 
-    public void setIdTarjetaCreditoDebitoFk(TarjetasCreditoDebito idTarjetaCreditoDebitoFk) {
-        this.idTarjetaCreditoDebitoFk = idTarjetaCreditoDebitoFk;
+    public void setIdTarjetaCreditoDebitoFk(TarjetasCreditoDebito idTarjetaFk) {
+        this.idTarjetaFk = idTarjetaFk;
     }
 
     @Override

@@ -3,6 +3,7 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -35,10 +36,10 @@ public class Detallespresupuesto implements Serializable {
     @Column(name = "CANTIDAD")
     private Short cantidad;
     @JoinColumn(name = "ID_DP_FK", referencedColumnName = "ID_PRESUPUESTO", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     private Presupuestos presupuestos;
     @JoinColumn(name = "FK_PRODUCTO", referencedColumnName = "SID", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     private Productos productos;
 
     public Detallespresupuesto() {
