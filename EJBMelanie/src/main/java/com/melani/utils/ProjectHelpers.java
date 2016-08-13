@@ -14,7 +14,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 public class ProjectHelpers { 
     public String encryptionKey;
-   // private static final SecretKeySpec KEY = new SecretKeySpec("MyKey".getBytes(), "Blowfish/ECB/PKCS5Padding");    
+   
     public ProjectHelpers(){}
     public String parsearCaracteresEspecialesXML(String xmlNota){        
         String xml;
@@ -42,33 +42,7 @@ public class ProjectHelpers {
            xml=sb.toString();
            return xml;    
     }   
-//    public static String encriptar(String frase){
-//                            String encryptedRet="No Encrypted";
-//                          try {            
-//                                Cipher cipher = Cipher.getInstance("Blowfish/ECB/PKCS5Padding");                                            
-//                                cipher.init(Cipher.ENCRYPT_MODE, KEY);            
-//                                byte[]encrypted=cipher.doFinal(frase.getBytes("UTF-8"));            
-//                                encryptedRet=new String(encrypted);                          
-//                            } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
-//                                Logger.getLogger(e.getMessage());
-//                            } catch (UnsupportedEncodingException ex) {
-//                Logger.getLogger(ProjectHelpers.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//            return encryptedRet;                                
-//      }
-//    public static String decriptar(String fraseEncriptada){
-//                String decriptedRet="No decrypted";
-//               try {
-//                Cipher cipher = Cipher.getInstance("Blowfish/ECB/PKCS5Padding");
-//                cipher.init(Cipher.DECRYPT_MODE, KEY);
-//                byte[] encryptedData=fraseEncriptada.getBytes("UTF-8");
-//                byte[] decrypted = cipher.doFinal(encryptedData);
-//                 decriptedRet = new String(decrypted);
-//            } catch (UnsupportedEncodingException|NoSuchAlgorithmException | NoSuchPaddingException |InvalidKeyException | IllegalBlockSizeException |BadPaddingException ex) {
-//                Logger.getLogger(ex.getMessage());
-//            }             
-//          return decriptedRet;                                
-//    } 
+
     
     
     public String encrypt(String value) {

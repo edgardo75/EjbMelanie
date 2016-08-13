@@ -872,15 +872,7 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
          
                    ejbEntradasSalidas.calculosPorNumerodeCupon(datosnotapedido.getAnticipo(),notape);
          
-//else{
-//                if(datosnotapedido.getAnticipo()>0&&datosnotapedido.getEnefectivo()=='1'){
-//                    ejbEntradasSalidas.calculosPorAnticipoNotaPedido(datosnotapedido.getAnticipo(), notape);
-//                }else{
-//                    if(datosnotapedido.getAnticipo()>0&&datosnotapedido.getEnefectivo()=='0'){
-//                        ejbEntradasSalidas.calculosPorNumerodeCupon(datosnotapedido.getAnticipo(), notape);
-//                    }
-//                }
-//         }
+
     }
     private void verificarAnticipoParaInsertarComoEntradaCaja(DatosNotaPedido datos,Notadepedido notape) {            
                 ejbEntradasSalidas.calculosPorAnticipoNotaPedido(datos.getAnticipo(),notape);        
@@ -896,33 +888,6 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
             }
         
         }
-        
-        
-//                if(datosnotapedido.getEntregado()=='1'&&datosnotapedido.getCancelado()=='1'&&datosnotapedido.getEnefectivo()==1){
-//                        
-//        
-//                        verificarAnticipoParaInsertarComoEntradaCaja(datosnotapedido,nota);
-//                }else{
-//
-//                        if(datosnotapedido.getEntregado()=='1'&&datosnotapedido.getCancelado()=='1'&&datosnotapedido.getEnefectivo()==0){
-//                        
-//                            verificarNumeroDeCuponParaInsertarComoEntradaCaja(datosnotapedido, nota);
-//                        
-//                        }else{
-//
-//
-//                                if(datosnotapedido.getEnefectivo()==1){
-//
-//                                    verificarAnticipoParaInsertarComoEntradaCaja(datosnotapedido,nota);
-//                                  //  verificarNumeroDeCuponParaInsertarComoEntradaCaja(datosnotapedido,nota);
-//                                }else{
-//
-//                                    if(datosnotapedido.getNumerodecupon().length()>0){
-//                                          verificarNumeroDeCuponParaInsertarComoEntradaCaja(datosnotapedido,nota);
-//                                             //verificarAnticipoParaInsertarComoEntradaCaja(datosnotapedido,nota);
-//                                    }
-//                                } 
-//                        }
-//                }
+   
         }    
 }

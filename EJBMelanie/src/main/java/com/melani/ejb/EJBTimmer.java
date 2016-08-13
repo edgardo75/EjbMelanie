@@ -25,7 +25,7 @@ import javax.persistence.Query;
 @Stateless
 @WebService
 public class EJBTimmer {
-    @PersistenceContext(unitName = "EJBMelaniPU2")
+    @PersistenceContext()
     EntityManager em;    
     final String servidorSMTP = ResourceBundle.getBundle("email").getString("mail.smtp.host");                
     final String puertoEnvio = ResourceBundle.getBundle("email").getString("mail.smtp.port");

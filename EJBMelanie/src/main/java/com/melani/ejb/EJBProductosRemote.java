@@ -4,7 +4,7 @@ import javax.ejb.Remote;
 
 @Remote
 public interface EJBProductosRemote {   
-    //long addExistenciasProducto(long idproducto, int cantidad,float precio,int idusuario);
+    
     String addProducto(String xmlProducto);
     String selectOneProducto(long idproducto);
     Productos agregarProductos(Productos producto);

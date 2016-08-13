@@ -12,7 +12,7 @@ import javax.persistence.Query;
 @Stateless(name="ejb/EJBLocalidades")
 @WebService(serviceName="ServicesLocalidades",name="LocalidadesWs")
 public class EJBLocalidades implements EJBLocalidadesRemote {    
-     @PersistenceContext(unitName="EJBMelaniPU2")
+     @PersistenceContext()
      private EntityManager em; 
     @Override
     public String searchLocXProvincia(short idProvincia) {

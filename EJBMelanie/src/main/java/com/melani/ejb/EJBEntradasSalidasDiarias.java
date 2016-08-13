@@ -33,7 +33,7 @@ public class EJBEntradasSalidasDiarias implements EJBEntradasSalidaDiariasRemote
     }
 
     @Override
-    public byte insertarEntradaSalidaManual(String monto, byte valorEntradaSalidaBit) {
+    public byte insertarEntradaSalidaManual(String monto, byte valorEntradaSalidaBit,String detalle) {
         byte retorno; 
         EntradasySalidasCaja entradaSalida = new EntradasySalidasCaja();
         SimpleDateFormat sdfHora = new SimpleDateFormat("hh:mm:ss");    
@@ -52,12 +52,12 @@ public class EJBEntradasSalidasDiarias implements EJBEntradasSalidaDiariasRemote
                 case 0:{
                     entradaSalida.setEntradas(0.00);
                     entradaSalida.setSalidas(Double.valueOf(monto));
-                    entradaSalida.setDetalles("Salida Manual");
+                    entradaSalida.setDetalles((detalle!=null) ? detalle : "Salida Manual");
                     break;
                 }default:{
                     entradaSalida.setEntradas(Double.valueOf(monto));
                     entradaSalida.setSalidas(0.00);
-                    entradaSalida.setDetalles("Entrada Manual");
+                    entradaSalida.setDetalles((detalle!=null)?detalle:"Entrada Manual");
                 }
             }     
         em.persist(entradaSalida);

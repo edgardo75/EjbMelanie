@@ -21,7 +21,7 @@ import javax.persistence.Query;
 @Stateless(name="ejb/EJBProductos")
 @WebService(serviceName="ServiceProductos",name="ProductosWs")
 public class EJBProductos implements EJBProductosRemote {    
-    @PersistenceContext(unitName="EJBMelaniPU2")    
+    @PersistenceContext()    
     private EntityManager em; 
     private final Imagen imagen = new Imagen();   
     @Override
