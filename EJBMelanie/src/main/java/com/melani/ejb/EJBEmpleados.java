@@ -75,7 +75,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
             Query consulta = em.createQuery("SELECT e FROM Empleados e order by e.idPersona desc");            
             List<Empleados>lista = consulta.getResultList();
             if(lista.size()>0){
-                    StringBuilder xmlLoop = new StringBuilder(32);                 
+                    StringBuilder xmlLoop = new StringBuilder(5);                 
                     
                     for (Empleados empleados : lista) {
                       String resultado=(empleados.getKeyPassword().length()>0)?passTry.decrypt(empleados.getKeyPassword(),empleados.getPassword()):"";
@@ -177,13 +177,13 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
         long retorno = 0;         
             DatosEmpleado empleado = datosEmpleadosObject(xmlEmpleado);//convierto a objeto    
             
-            System.out.println(empleado.getPassword()+" "+empleado.getPasswordre());
+            
             retorno=validarDatosEmpleado(empleado);//retorno el resultado de validar datos nombre y apellido, password           
            if(retorno==0){      
                         retorno = valorRetornadoAlBuscarEmailyNombreUsuario(retorno, empleado.getNumeroDocumento(),
                                 empleado.getEmail(),empleado.getNombreUsuario());                        
                             if(retorno>0){   
-                                System.out.println("eda");
+                                
                                            retorno = processEmployee(empleado,xmlEmpleado);
                             }
            }
@@ -238,7 +238,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                                        
                                            String fraseEncriptada = passwordTry.encrypt(empleado.getPassword());
                                            if(!fraseEncriptada.equals("No Encrypted")){
-                                                empfulltime.setPassword(empleado.getPassword());
+                                                empfulltime.setPassword(passwordTry.encrypt(empleado.getPassword()));
                                                 empfulltime.setKeyPassword(passwordTry.encryptionKey);
                                            }else{
                                                return -11;
@@ -359,7 +359,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
             
             if(!empleado.isEmpty()){
                 for (Empleados empleados : empleado) {                       
-                        System.out.println(" RESULTADO DECRIPT "+passTry.decrypt(empleados.getKeyPassword(),empleados.getPassword()));
+                        
                     result = String.valueOf(passTry.decrypt(empleados.getKeyPassword(),empleados.getPassword()).equals(pass));
                             
                 }
@@ -367,7 +367,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
             }else{
                 result = "Empleado no encontrado";
             }      
-            System.out.println(result);
+            
             return  result;
     }
     private long processEmployee(DatosEmpleado empleado, String xmlEmpleado) {
@@ -487,12 +487,18 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
             retorno = "Exito";
             return retorno;
         }
-        public String desencriptar(Empleados empleado){
+        private String desencriptar(Empleados empleado){
         
             ProjectHelpers passwordTry = new ProjectHelpers();
             String retorno ="nada";
             retorno = passwordTry.decrypt(empleado.getKeyPassword(), empleado.getPassword());
             
             return retorno;
+        }
+        public String decriptarPass(long idEmpleado){
+            ProjectHelpers project = new ProjectHelpers();
+            Empleados empleados = em.find(Empleados.class, idEmpleado);
+            
+            return project.decrypt(empleados.getKeyPassword(), empleados.getPassword());
         }
 }

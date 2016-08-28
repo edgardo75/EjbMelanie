@@ -3,6 +3,7 @@ import com.melani.entity.Clientes;
 import com.melani.entity.Domicilios;
 import com.melani.entity.Generos;
 import com.melani.entity.HistoricoDatosClientes;
+import com.melani.entity.Notadepedido;
 import com.melani.entity.Personas;
 import com.melani.entity.PersonasDomicilios;
 import com.melani.entity.Personastelefonos;
@@ -18,6 +19,7 @@ import com.melani.utils.ProjectHelpers;
 import com.melani.utils.ValidateClientandUserData;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
+import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
@@ -409,28 +411,54 @@ private long guardarDomicilioyTelefonoCliente(String xmlClienteDomicilioTelefono
             return retorno;        
     }
     @Override
-    public String searchClientForNameAndLastName(String name,String lastname) {
+    public String searchClientForName(String nameAndLastname) {
         String xml = "<Lista>\n";        
-            String sbname = name+"%";
-            String sblastname = lastname+"%";
-                    String sql = "SELECT p FROM Personas p WHERE p.nombre LIKE :nombre and p.apellido LIKE :apellido";
-                            Query consulta = em.createQuery(sql);
-                            consulta.setParameter("nombre", sbname.toUpperCase());
-                            consulta.setParameter("apellido", sblastname.toUpperCase());
-                            List<Personas>lista = consulta.getResultList();
-                                StringBuilder xmlLoop = new StringBuilder(32);
-                                for (Personas personas : lista) {
-                                    xmlLoop.append("<item>\n").append("<id>")
-                                            .append(personas.getIdPersona())
-                                            .append("</id>\n").append("<apellido>")
-                                            .append(personas.getApellido()).append("</apellido>\n").append("<nombre>")
-                                            .append(personas.getNombre()).append("</nombre>\n").append("<idtipodocu>")
-                                            .append(personas.getTipodocumento().getId()).append("</idtipodocu>\n").append("<nrodocu>")
-                                            .append(personas.getNrodocumento()).append("</nrodocu>\n").append("</item>\n");
+            
+//        
+//               CriteriaBuilder cb = em.getCriteriaBuilder();
+//               CriteriaQuery cq = cb.createQuery();
+//               Root<Clientes> from = cq.from(Clientes.class);
+//                Path<String> path1 = from.get("nombre");
+//                Path<String> path2 = from.get("apellido");
+//               
+//               
+        
+            
+                    //String sql = "SELECT p FROM Personas p WHERE p.nombre Like :apellidoynombre";
+                    if(!nameAndLastname.isEmpty()){
+                            Query consulta = em.createQuery("SELECT c FROM Clientes c WHERE lower(c.nombre) like lower(:apellidoynombre) OR LOWER(c.apellido) like lower(:apellidoynombre)");
+                            consulta.setParameter("apellidoynombre", new StringBuffer(nameAndLastname.toLowerCase()).append("%").toString());                            
+                            List<Clientes>lista = consulta.getResultList();
+                            if(!lista.isEmpty()){
+                                StringBuilder xmlLoop = new StringBuilder(5);
+                                
+                                for (Clientes cliente : lista) {
+                                    if(!cliente.getNotadepedidoList().isEmpty()){
+                                                xmlLoop.append("<item>\n").append("<id>")
+                                                        .append(cliente.getIdPersona())
+                                                        .append("</id>\n").append("<apellido>")
+                                                        .append(cliente.getApellido()).append("</apellido>\n").append("<nombre>")
+                                                        .append(cliente.getNombre()).append("</nombre>\n").append("<idtipodocu>")
+                                                        .append(cliente.getTipodocumento().getId()).append("</idtipodocu>\n").append("<nrodocu>")
+                                                        .append(cliente.getNrodocumento()).append("</nrodocu>\n");
+                                                List<Notadepedido>notasCliente = cliente.getNotadepedidoList();
+                                                for (Notadepedido notadepedido : notasCliente) {
+
+                                                    xmlLoop.append("<itemNota>").append("<nota>").append(notadepedido.getId()).append("</nota>").append("<fecha>").append(SimpleDateFormat.getDateInstance().format(notadepedido.getFechadecompra())).append("</fecha>").append("</itemNota>");
+                                                }
+                                                xmlLoop.append("</item>\n");
+                                    }
                                 }
-                                xml+=xmlLoop;        
-            return xml+"</Lista>\n";        
-    }    
+                                xml+=xmlLoop;  
+                                xml+="</Lista>\n";
+                            }else{
+                                xml="NO HAY RESULTADO";
+                            }
+                    }
+                                
+            return xml;        
+    } 
+    
     private ClienteDomicilioTelefono parsear_a_objetos(String xmlClienteDomicilioTelefono){
         ClienteDomicilioTelefono datoscliente;
         ProjectHelpers xmlParser = new ProjectHelpers();

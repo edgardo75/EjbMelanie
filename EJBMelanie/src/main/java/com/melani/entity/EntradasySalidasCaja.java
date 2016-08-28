@@ -32,7 +32,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "EntradasySalidasCaja.findByNumerocupon", query = "SELECT e FROM EntradasySalidasCaja e WHERE e.numerocupon = :numerocupon"),
     @NamedQuery(name = "EntradasySalidasCaja.findByEnefectivo", query = "SELECT e FROM EntradasySalidasCaja e WHERE e.enefectivo = :enefectivo"),
     @NamedQuery(name = "EntradasySalidasCaja.findByHora", query = "SELECT e FROM EntradasySalidasCaja e WHERE e.hora = :hora"),
-    @NamedQuery(name = "EntradasySalidasCaja.findByCurrentDate", query = "SELECT e FROM EntradasySalidasCaja e WHERE e.fecha = CURRENT_DATE")})
+    @NamedQuery(name = "EntradasySalidasCaja.findByCurrentDate", query = "SELECT e FROM EntradasySalidasCaja e WHERE e.fecha = CURRENT_DATE")
+})
 public class EntradasySalidasCaja implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
