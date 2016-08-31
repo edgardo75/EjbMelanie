@@ -91,9 +91,9 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
                                                 almacenarHistorico(datosNota,notape);            
                                                     }
                                          }
-                                         Query queryFindByIdProducto =em.createNamedQuery("Notadepedido.findClientFk");
-                                            queryFindByIdProducto.setParameter("id", cliente.getIdPersona());
-                                            List<Notadepedido>lista=queryFindByIdProducto.getResultList();
+                                         Query queryFindByIdCliente =em.createNamedQuery("Notadepedido.findClientFk");
+                                            queryFindByIdCliente.setParameter("id", cliente.getIdPersona());
+                                            List<Notadepedido>lista=queryFindByIdCliente.getResultList();
                                                 cliente.setNotadepedidoList(lista);
                                                     totalCompras = cliente.getTotalCompras()+notape.getMontototalapagar();
                                                     int totalPuntos = cliente.getTotalEnPuntos()+(int)totalCompras;
@@ -173,9 +173,9 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
                                     historico.setAnulado(datosNotaPedido.getAnulado());
                                     historico.setAccion("Historico Almacenado con exito nota de pedido N "+notape.getId());
                     em.persist(historico);                    
-                        Query queryFindByIdProducto = em.createNamedQuery("Historiconotapedido.findByFkIdNotaPedido");
-                                queryFindByIdProducto.setParameter("idnota", notape.getId());
-                                notape.setHistoriconotapedidoList(queryFindByIdProducto.getResultList());                   
+                        Query queryFindByIdNotaPedido = em.createNamedQuery("Historiconotapedido.findByFkIdNotaPedido");
+                                queryFindByIdNotaPedido.setParameter("idnota", notape.getId());
+                                notape.setHistoriconotapedidoList(queryFindByIdNotaPedido.getResultList());                   
                                 em.persist(notape);       
     }
 

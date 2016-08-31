@@ -66,7 +66,8 @@ public class Personas implements Serializable {
     private List<Personastelefonos> personastelefonoss;
     @JoinColumn(name = "ID_GENERO", referencedColumnName = "ID_GENERO")
     @ManyToOne(fetch=FetchType.LAZY,optional = false)
-    private Generos generos;        
+    private Generos generos;    
+    
 
     public Personas(){
     }
