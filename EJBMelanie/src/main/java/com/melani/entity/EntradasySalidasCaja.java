@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "EntradasySalidasCaja.findByNumerocupon", query = "SELECT e FROM EntradasySalidasCaja e WHERE e.numerocupon = :numerocupon"),
     @NamedQuery(name = "EntradasySalidasCaja.findByEnefectivo", query = "SELECT e FROM EntradasySalidasCaja e WHERE e.enefectivo = :enefectivo"),
     @NamedQuery(name = "EntradasySalidasCaja.findByHora", query = "SELECT e FROM EntradasySalidasCaja e WHERE e.hora = :hora"),
-    @NamedQuery(name = "EntradasySalidasCaja.findByCurrentDate", query = "SELECT e FROM EntradasySalidasCaja e WHERE e.fecha = CURRENT_DATE")
+    @NamedQuery(name = "EntradasySalidasCaja.findByCurrentDate", query = "SELECT e FROM EntradasySalidasCaja e WHERE Cast(e.fecha as Date) = CURRENT_DATE")
 })
 public class EntradasySalidasCaja implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -41,6 +41,7 @@ public class EntradasySalidasCaja implements Serializable {
     @TableGenerator(name="EntradasySalidasCajaIdGen", table="ID_GEN_ENTRADASYSALIDASCAJA",
     pkColumnName="FNAME",pkColumnValue="EntradasySalidasCaja", valueColumnName="FKEY",
     allocationSize=1)
+    @Column(name = "ID_ENTRADASYSALIDAS")
     @Basic(fetch = FetchType.LAZY)
     private Integer id_EntradasySalidas;
     @Basic(fetch = FetchType.LAZY)

@@ -85,7 +85,7 @@ public class EJBEntradasSalidasDiarias implements EJBEntradasSalidaDiariasRemote
         String horaManana2 = ResourceBundle.getBundle("config").getString("HORA_MANANA2");
         StringBuilder xmlES;        
         String xml ="";
-                   Query consulta = em.createQuery("SELECT e FROM EntradasySalidasCaja e WHERE CURRENT_DATE = e.fecha AND e.hora  BETWEEN ?1 AND ?2 ORDER BY e.hora desc");
+                   Query consulta = em.createQuery("SELECT e FROM EntradasySalidasCaja e WHERE CURRENT_DATE = CAST(e.fecha AS DATE) AND e.hora  BETWEEN ?1 AND ?2 ORDER BY e.hora desc");
                             try {
                                 consulta.setParameter("1", new SimpleDateFormat("hh").parse(horaManana1));
                                 consulta.setParameter("2", new SimpleDateFormat("hh").parse(horaManana2));
@@ -106,7 +106,7 @@ public class EJBEntradasSalidasDiarias implements EJBEntradasSalidaDiariasRemote
         String horaTarde2 = ResourceBundle.getBundle("config").getString("HORA_TARDE2");
         StringBuilder xmlES;
         String xml ="";                
-                Query consulta = em.createQuery("SELECT e FROM EntradasySalidasCaja e WHERE CURRENT_DATE = e.fecha AND e.hora BETWEEN ?1 AND ?2 ORDER BY e.hora desc");
+                Query consulta = em.createQuery("SELECT e FROM EntradasySalidasCaja e WHERE CURRENT_DATE = CAST(e.fecha AS DATE) AND e.hora BETWEEN ?1 AND ?2 ORDER BY e.hora desc");
                                 try {
                                     consulta.setParameter("1", new SimpleDateFormat("hh").parse(horaTarde1));
                                     consulta.setParameter("2", new SimpleDateFormat("hh").parse(horaTarde2));

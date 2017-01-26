@@ -13,4 +13,5 @@ public interface EJBProductosRemote {
     String actualizarProducto(String xmlProducto);
     int grabarImagen(long id_producto, byte[] longitudImagen,String nameImage,String magnitud);
     byte[] obtenerImagenProducto(long idProducto);
+    public long modificarCantidadDisponible(long idProducto,int cantidad);
 }

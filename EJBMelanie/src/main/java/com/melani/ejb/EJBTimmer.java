@@ -30,13 +30,13 @@ public class EJBTimmer {
     final String servidorSMTP = ResourceBundle.getBundle("email").getString("mail.smtp.host");                
     final String puertoEnvio = ResourceBundle.getBundle("email").getString("mail.smtp.port");
     Session ses = null;    
-    @Schedule(persistent = false,timezone = "America/Argentina/San_Juan",second = "00",hour = "21",minute = "30")            
+    @Schedule(persistent = false,timezone = "/*America/Argentina/San_Juan*/",second = "00",hour = "21",minute = "30")            
     private void ventasDiarias(){ 
          SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
           Query consulta = em.createQuery("SELECT SUM(n.montototalapagar) FROM Notadepedido n WHERE cast(n.fechadecompra as DATE) = CURRENT_DATE");
         
                     Properties props = new Properties();                    
-                    props.put("mail.host", servidorSMTP);
+                    props.put("mail.smtp.host", servidorSMTP);
                     props.put("mail.smtp.port", puertoEnvio);
                     props.put("mail.smtp.starttls.enable", "true");
                     props.put("mail.transport.protocol","smtp");

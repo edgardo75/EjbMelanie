@@ -78,7 +78,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                     StringBuilder xmlLoop = new StringBuilder(5);                 
                     
                     for (Empleados empleados : lista) {
-                      String resultado=(empleados.getKeyPassword().length()>0)?passTry.decrypt(empleados.getKeyPassword(),empleados.getPassword()):"";
+                      String resultado=(empleados.getKeyPassword()!=null)?passTry.decrypt(empleados.getKeyPassword(),empleados.getPassword()):"";
                       xmlLoop.append("<item>\n")
                         .append("<id>").append(empleados.getIdPersona()).append("</id>\n")
                         .append("<nombre>").append(empleados.getNombre()).append("</nombre>\n")

@@ -261,39 +261,39 @@ public class EJBNotaPedido implements EJBNotaPedidoRemote {
     public long entregarNotaPedido(String datosXML, int estado) {
         long result;
         char pendiente = '0';        
+
         DatosNotaPedido datosXMLNota = xstreamNotaPedido(datosXML);
+                 
                 GregorianCalendar gc = new GregorianCalendar(Locale.getDefault());
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
-                SimpleDateFormat sdfH = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");                
                 Notadepedido nota = em.find(Notadepedido.class, datosXMLNota.getIdnota());
                         if(nota.getEntregado()=='1'&& estado==1){
                             return 0;
                         }else{
                             Empleados empleado = em.find(Empleados.class, datosXMLNota.getUsuario_entregado());
-                                    if(estado==1){                                        
+                                    if(estado==1){        
+                                        
                                         nota.setEntregado('1');
                                         nota.setFechaentrega(gc.getTime());
                                         nota.setPendiente(pendiente);                                        
                                         nota.setIdusuarioEntregado(datosXMLNota.getUsuario_entregado());
                                         nota.setUltimaActualizacion(em.find(Empleados.class, datosXMLNota.getUsuario_entregado())+" "+sdf.format(gc.getTime()));
                                     }else{
-                                            try {
+                                            
                                                 pendiente ='1';
                                                 nota.setEntregado('0');
-                                                nota.setFechaentrega(sdfH.parse(ResourceBundle.getBundle("config").getString("FECHA_DEFAULT")));
+                                                nota.setFechaentrega(gc.getGregorianChange());
                                                 nota.setPendiente(pendiente);
                                                 nota.setIdusuarioEntregado(0L);
                                                 nota.setUltimaActualizacion(em.find(Empleados.class, datosXMLNota.getUsuario_entregado())+" "+sdf.format(gc.getTime()));
-                                            } catch (ParseException ex) {
-                                                java.util.logging.Logger.getLogger(EJBNotaPedido.class.getName()).log(Level.SEVERE, null, ex);
-                                            }
+                                            
                                     }
                                     List<Detallesnotadepedido>lista = nota.getDetallesnotadepedidoList();
                                 for (Detallesnotadepedido detallesnotadepedido : lista) {
-                                    detallesnotadepedido.setEntregado((char)estado);
+                                    detallesnotadepedido.setEntregado('1');
                                     detallesnotadepedido.setPendiente(pendiente);
                                 }
-                                em.persist(nota);            
+                                 em.flush();
                                     Historiconotapedido historico = new Historiconotapedido();
                                             if(estado==1){
                                                     historico.setAccion("Entregado por "+empleado.getNameuser());

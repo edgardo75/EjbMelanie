@@ -411,7 +411,7 @@ private long guardarDomicilioyTelefonoCliente(String xmlClienteDomicilioTelefono
             return retorno;        
     }
     @Override
-    public String searchClientForName(String nameAndLastname) {
+    public String searchClientForNameAndLastName(String nameAndLastname) {
         String xml = "<Lista>\n";        
             
 //        
@@ -426,7 +426,7 @@ private long guardarDomicilioyTelefonoCliente(String xmlClienteDomicilioTelefono
             
                     //String sql = "SELECT p FROM Personas p WHERE p.nombre Like :apellidoynombre";
                     if(!nameAndLastname.isEmpty()){
-                            Query consulta = em.createQuery("SELECT c FROM Clientes c WHERE lower(c.nombre) like lower(:apellidoynombre) OR LOWER(c.apellido) like lower(:apellidoynombre)");
+                            Query consulta = em.createQuery("SELECT c FROM Clientes c WHERE LOWER(CONCAT(c.nombre,' ',c.apellido)) like lower(:apellidoynombre)");
                             consulta.setParameter("apellidoynombre", new StringBuffer(nameAndLastname.toLowerCase()).append("%").toString());                            
                             List<Clientes>lista = consulta.getResultList();
                             if(!lista.isEmpty()){
