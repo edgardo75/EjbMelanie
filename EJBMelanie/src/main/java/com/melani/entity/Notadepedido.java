@@ -59,7 +59,7 @@ query = "SELECT n FROM Notadepedido n"), @NamedQuery(name = "Notadepedido.findBy
 @NamedQuery(name = "Notadepedido.findClientFk",query = "SELECT n FROM Notadepedido n WHERE n.fkIdcliente.idPersona = :id")})
 public class Notadepedido implements Serializable {
     private static final long serialVersionUID = 1L;
-    @Id        
+    @Id
     @TableGenerator(name="NoPeIdGen", table="ID_GEN_NOTAP",
     pkColumnName="FNAME",pkColumnValue="Notadepedido" , valueColumnName="FKEY",
     allocationSize=1) 
