@@ -6,7 +6,7 @@ import com.melani.entity.Generos;
 import com.melani.entity.Notadepedido;
 import com.melani.entity.Tiposdocumento;
 import com.melani.utils.DatosEmpleado;
-import com.melani.utils.ProjectHelpers;
+
 import com.melani.utils.ValidateClientandUserData;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
@@ -26,12 +26,10 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
     @PersistenceContext()
     private EntityManager em; 
     String nombreyApellidoPattern;
-    String numberPattern_Dni;
-    //String email_Pattern;
+    String numberPattern_Dni;    
     String telefonoPattern;
     String prefijoPattern;
-    String nameUser_pattern;
-    String password_pattern;
+    String nameUser_pattern;    
     ValidateClientandUserData validarDatosEmpleadoUser;
     public EJBEmpleados(){
         this.validarDatosEmpleadoUser = new ValidateClientandUserData();
@@ -39,8 +37,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
         this.numberPattern_Dni="(?=^.{1,10}$)\\d+$";      
         this.telefonoPattern ="^(4|15)(\\d){6,}+$";
         this.prefijoPattern ="^(\\d){1,8}+$";   
-        this.nameUser_pattern="(?=^.{1,20}$)^([\\w\\.^\\-.][\\s]?)([\\w\\-\\s]*)([\\w]+$?)+$"; 
-        this.password_pattern="^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\\s).*$";
+        this.nameUser_pattern="(?=^.{1,20}$)^([\\w\\.^\\-.][\\s]?)([\\w\\-\\s]*)([\\w]+$?)+$";         
     }
     
      @Override
@@ -71,14 +68,12 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
     @Override
     public String selectAllEmpleados() {
        String xml="<?xml version='1.0' encoding='utf-8'?>\n"+"<Lista>\n";        
-       ProjectHelpers passTry = new ProjectHelpers();
+       
             Query consulta = em.createQuery("SELECT e FROM Empleados e order by e.idPersona desc");            
             List<Empleados>lista = consulta.getResultList();
             if(lista.size()>0){
-                    StringBuilder xmlLoop = new StringBuilder(5);                 
-                    
-                    for (Empleados empleados : lista) {
-                      String resultado=(empleados.getKeyPassword()!=null)?passTry.decrypt(empleados.getKeyPassword(),empleados.getPassword()):"";
+                    StringBuilder xmlLoop = new StringBuilder(5);  
+                    for (Empleados empleados : lista) {                      
                       xmlLoop.append("<item>\n")
                         .append("<id>").append(empleados.getIdPersona()).append("</id>\n")
                         .append("<nombre>").append(empleados.getNombre()).append("</nombre>\n")
@@ -90,7 +85,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                         .append("<observaciones>").append(empleados.getObservaciones()).append("</observaciones>\n")
                         .append("<email>").append(empleados.getEmail()).append("</email>\n")
                         .append("<nameuser>").append(empleados.getNameuser()).append("</nameuser>\n")                                                      
-                        .append("<clave>").append(resultado).append("</clave>")
+                        .append("<clave>").append(empleados.getPassword()).append("</clave>")
                         .append(obtenerEmpleado(empleados))
                         .append("</item>\n");
                 }                   
@@ -228,21 +223,14 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
     private long addFullTimeEmpleado(DatosEmpleado empleado) {
         long retorno;            
             GregorianCalendar gc = new GregorianCalendar(Locale.getDefault());
-            ProjectHelpers passwordTry = new ProjectHelpers();
+
                  FullTimeEmpleado empfulltime = new FullTimeEmpleado();
                                          empfulltime.setApellido(empleado.getApellido().toUpperCase());
                                          if(!empleado.getEmail().isEmpty())
                                             empfulltime.setEmail(empleado.getEmail().toLowerCase());
                                          empfulltime.setNombre(empleado.getNombre().toUpperCase());
                                          empfulltime.setNameuser(empleado.getNombreUsuario());
-                                       
-                                           String fraseEncriptada = passwordTry.encrypt(empleado.getPassword());
-                                           if(!fraseEncriptada.equals("No Encrypted")){
-                                                empfulltime.setPassword(passwordTry.encrypt(empleado.getPassword()));
-                                                empfulltime.setKeyPassword(passwordTry.encryptionKey);
-                                           }else{
-                                               return -11;
-                                           }                                       
+                                        empfulltime.setPassword(empleado.getPassword().length()>0?empleado.getPassword():"");
                                          empfulltime.setGeneros(em.find(Generos.class, empleado.getIdGenero()));
                                          empfulltime.setEstado((short)1);
                                          empfulltime.setFechacarga(gc.getTime());
@@ -261,19 +249,13 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
     }
     private long addPartTimeEmpleado(DatosEmpleado empleado) {
         long retorno;       
-            GregorianCalendar gc = new GregorianCalendar(Locale.getDefault());
-            ProjectHelpers passTry = new ProjectHelpers();
+            GregorianCalendar gc = new GregorianCalendar(Locale.getDefault());           
               EmpleadoParttime empparttime = new EmpleadoParttime();
                                                     empparttime.setApellido(empleado.getApellido().toUpperCase());
                                                     empparttime.setNameuser(empleado.getNombreUsuario());                                      
                                                     empparttime.setNombre(empleado.getNombre().toUpperCase());
-                                                    empparttime.setFechacarga(gc.getTime());                                                                                                           
-                                                        if(!passTry.encrypt(empleado.getPassword()).equals("No Encrypted"))  {  
-                                                            empparttime.setPassword(empleado.getPassword());
-                                                            empparttime.setKeyPassword(passTry.encryptionKey);
-                                                        }else{
-                                                            return -11;
-                                                        }
+                                                    empparttime.setFechacarga(gc.getTime());    
+                                                    empparttime.setPassword(empleado.getPassword().length()>0?empleado.getPassword():"");
                                                     empparttime.setEmptype("PARTTIME");
                                                     empparttime.setTipodocumento(em.find(Tiposdocumento.class, empleado.getIdTipoDocumento()));
                                                     empparttime.setNrodocumento(empleado.getNumeroDocumento());
@@ -300,7 +282,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                                 retorno=-12;
                             }
                             
-                            if(!validarDatosEmpleadoUser.validate(empleado.getPassword(),password_pattern) && (empleado.getPassword().equals(empleado.getPasswordre()))) {
+                            if(!empleado.getPassword().equals(empleado.getPasswordre())) {
                                 retorno=-11;
                             
                             }else{                                
@@ -310,9 +292,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                                     else
                                     {                  
                                         
-                                             if(!validarDatosEmpleadoUser.validate(empleado.getPassword(),password_pattern)){
-                                                 retorno = -17;
-                                             }
+                                            
                                     }             
                             }              
                         }else{
@@ -352,22 +332,17 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
     @Override
     public String checkPassEmployee(long idEmpleado,String pass) {        
         String result = "";        
-            Query consulta = em.createNamedQuery("Empleados.chkpass");
-            ProjectHelpers passTry = new ProjectHelpers();
+            Query consulta = em.createNamedQuery("Empleados.chkpass");           
             consulta.setParameter("1", idEmpleado);
             List<Empleados>empleado = consulta.getResultList();
             
             if(!empleado.isEmpty()){
-                for (Empleados empleados : empleado) {                       
-                        
-                    result = String.valueOf(passTry.decrypt(empleados.getKeyPassword(),empleados.getPassword()).equals(pass));
-                            
+                for (Empleados empleados : empleado) {
+                    result = String.valueOf(empleados.getPassword().equals(pass));
                 }
-                
             }else{
                 result = "Empleado no encontrado";
-            }      
-            
+            }    
             return  result;
     }
     private long processEmployee(DatosEmpleado empleado, String xmlEmpleado) {
@@ -375,7 +350,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
         int retEmployee;
         long retorno = 0;
         //selecciono la persona con el tipo de empleado a buscar
-                        ProjectHelpers passTry = new ProjectHelpers();
+                       // ProjectHelpers passTry = new ProjectHelpers();
                                       Query sqlEmpleadoEmptype =em.createQuery("Select e From Empleados e "
                                                        + "Where e.idPersona = :idpersona and e.emptype like :emptype");
                                                    sqlEmpleadoEmptype.setParameter("idpersona",(long) empleado.getId());
@@ -445,8 +420,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                                                                                                        fulltimeEmploy.setNombre(empleado.getNombre());
                                                                                                        fulltimeEmploy.setSalario(Double.valueOf(empleado.getSalario()));
                                                                                                        fulltimeEmploy.setObservaciones(empleado.getObservaciones());
-                                                                                                       fulltimeEmploy.setPassword(passTry.encrypt(empleado.getPassword()));
-                                                                                                       fulltimeEmploy.setKeyPassword(passTry.encryptionKey);
+                                                                                                        fulltimeEmploy.setPassword(empleado.getPassword().length()>0?empleado.getPassword():"");
                                                                                                        fulltimeEmploy.setTipodocumento(em.find(Tiposdocumento.class, empleado.getIdTipoDocumento()));
                                                                                                        em.persist(fulltimeEmploy);                                                                                                     
                                                                                                        retorno = fulltimeEmploy.getIdPersona();
@@ -463,8 +437,7 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                                                                                                        empleadoPartime.setNombre(empleado.getNombre());
                                                                                                        empleadoPartime.setSalarioporhora(Double.valueOf(empleado.getSalarioxhora()));
                                                                                                        empleadoPartime.setObservaciones(empleado.getObservaciones());
-                                                                                                       empleadoPartime.setPassword(passTry.encrypt(empleado.getPassword())); 
-                                                                                                       empleadoPartime.setKeyPassword(passTry.encryptionKey); 
+                                                                                                        empleadoPartime.setPassword(empleado.getPassword().length()>0?empleado.getPassword():"");                                                                                                      
                                                                                                        empleadoPartime.setTipodocumento(em.find(Tiposdocumento.class, empleado.getIdTipoDocumento()));
                                                                                                        em.persist(empleadoPartime);
                                                                                                        retorno = empleadoPartime.getIdPersona();
@@ -475,30 +448,5 @@ public class EJBEmpleados implements EJBEmpleadosRemote {
                                                 }  //end if
                      
                         return retorno;                                               
-        }
-        public String encriptar(String password,long idUser){
-            ProjectHelpers passwordTry = new ProjectHelpers();
-            String retorno ="nada";
-            Empleados empleado = em.find(Empleados.class, idUser);
-            retorno = passwordTry.encrypt(password);
-            empleado.setPassword(retorno);
-            empleado.setKeyPassword(passwordTry.encryptionKey);
-            em.persist(empleado);
-            retorno = "Exito";
-            return retorno;
-        }
-        private String desencriptar(Empleados empleado){
-        
-            ProjectHelpers passwordTry = new ProjectHelpers();
-            String retorno ="nada";
-            retorno = passwordTry.decrypt(empleado.getKeyPassword(), empleado.getPassword());
-            
-            return retorno;
-        }
-        public String decriptarPass(long idEmpleado){
-            ProjectHelpers project = new ProjectHelpers();
-            Empleados empleados = em.find(Empleados.class, idEmpleado);
-            
-            return project.decrypt(empleados.getKeyPassword(), empleados.getPassword());
         }
 }

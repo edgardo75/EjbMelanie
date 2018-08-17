@@ -113,7 +113,7 @@ public class EJBProductos implements EJBProductosRemote {
                                     existencias.setPreciounitario(producto.getPrecioUnitario());
                                     existencias.setProductos(em.find(Productos.class, idProducto));
                                     em.persist(existencias);
-                                        Query obtenerExistenciasDeUnProducto = em.createQuery("SELECT e FROM ExistenciasProductos e WHERE e.productos.sid = :idproducto");
+                                        Query obtenerExistenciasDeUnProducto = em.createQuery("SELECT e FROM ExistenciasProductos e INNER JOIN FETCH e.productos WHERE e.productos.sid = :idproducto");
                                         obtenerExistenciasDeUnProducto.setParameter("idproducto", producto.getSid());
                                             List<ExistenciasProductos>lista = obtenerExistenciasDeUnProducto.getResultList();
                                                 producto.setExistenciasProductoss(lista);
